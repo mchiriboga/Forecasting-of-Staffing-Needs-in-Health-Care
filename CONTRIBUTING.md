@@ -1,6 +1,6 @@
 # Contributing
 
-In this project, we will be using git as the version control system for our work. By participating in this project, each group member should agree to abide by the [code of conduct](https://github.com/UBC-MDS/DSCI554_Project/blob/master/CODE_OF_CONDUCT.md). Each group member will fork the main repository into their personal repository. They will work locally, and send pull-requests of their update to the main repository. At least one other team mate will review,  critique (if necessary), and finally accept their team mate's pull request. Each contributor will also use GitHub issue to communicate to their team mates regarding any problems, ideas and concerns.
+In this project, we will be using git as the version control system for our work. By participating in this project, each group member should agree to abide by the [code of conduct](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/CODE_OF_CONDUCT.md). Each group member will fork the main repository into their personal repository. They will work locally, and send pull-requests of their update to the main repository. At least one other team mate will review,  critique (if necessary), and finally accept their team mate's pull request. Each contributor will also use GitHub issue to communicate to their team mates regarding any problems, ideas and concerns.
 
 The full instructions can be found from the [Github guides to Branching](https://guides.github.com/introduction/flow/).
 
@@ -11,6 +11,12 @@ Clone the repo:
 git clone https://github.com/UBC-MDS/DSCI_591_capstone-Providence.git
 ```
 
+Make branch:
+```
+git branch <branch name>
+git checkout <branch name>
+```
+
 Make changes, then push the repo:
 ```
 git add .
@@ -18,17 +24,7 @@ git commit -m "<meaningful_message>"
 git push
 ```
 
-Check if the main repo is added as a remote repo:
-```
-git remote -v
-```
-
-If the main repo is not added:
-```
-git remote add upstream <original_repo_URL>
-```
-
-If the current `master` branch falls behind the master branch:
+If the current branch falls behind the `master` branch:
 ```
 git fetch upstream
 git merge upstream/master
