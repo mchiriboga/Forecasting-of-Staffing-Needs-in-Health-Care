@@ -41,8 +41,6 @@ Contributing document derived from [Thoughtbot](https://github.com/thoughtbot/fa
 
 A properly formed git commit subject line should always be able to complete the following sentence
 
-If applied, this commit will <your subject line here>
-
 # Commit Guideline
 
 ### Rules for a great git commit message style
