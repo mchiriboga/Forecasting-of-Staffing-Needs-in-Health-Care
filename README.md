@@ -9,4 +9,8 @@ Forecasting of Staffing Needs,
 - [Patrick Tung](https://github.com/tungpatrick)
 
 ### Milestones:
- - [Proposal Presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.ipynb)
+ |Deliverable|Link|
+ |---|---|
+ |Proposal Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.ipynb)|
+ ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.pdf)|
+ 
