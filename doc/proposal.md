@@ -63,6 +63,3 @@ We have the following time schedule based on group discussion, and the actual pr
 | Week 5 | Build algorithms, testing, adjusting |
 | Week 6 | Improve the dashboard, wrapping up |
 | Week 7 | Presentations and reports |
-
-
-### Feedback and Discussion
