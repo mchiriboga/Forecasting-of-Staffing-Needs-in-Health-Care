@@ -4,15 +4,15 @@
 April, 2019                               
 
 
-[Marcelle Chiriboga](https://github.com/mchiriboga), 
-[Luo Yang](https://github.com/lyiris22), 
-[Patrick Tung](https://github.com/tungpatrick) and 
+[Marcelle Chiriboga](https://github.com/mchiriboga),
+[Luo Yang](https://github.com/lyiris22),
+[Patrick Tung](https://github.com/tungpatrick) and
 [Weifeng (Davy) Guo](https://github.com/DavyGuo)
 
 Mentored by [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 
-### Project Summary
+### Executive Summary
 
 The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care(PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage.
 
@@ -34,23 +34,24 @@ The final product will contain three component:
 
 ### Data Science Techniques
 
-Since we are having more than 2 millions records of exceptions through 9 years, we intend to split the raw data based on year. In this way, not only we could have smaller dataset to generate some insight, but also telling the difference causing by time (facility opening, system develop, etc).  
+Since we have more than 2 millions records of exceptions for over 9 years, we intend to split the raw data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system develop, etc).  
 
-We will start from simple question with simple data and move forward once we achieve certain goal. The milestone for questions are:
+We will start from simple question with simple data and move forward once we achieve certain goal. The milestones for our problems are:
 
 Step 1: How many exceptions will happen next month?
 
-Step 2: For those exception predicted, how many of them will find relief or not find one.
+Step 2: For those exception predicted, what kind of exception group they are?
 
-Step 3: For those exception predicted, what kind of position they are.
+Step 3: For those exception predicted, what kind of position they are?
 
-We intend to try 3 approaches to solve the problem, and will apply some/all of them based on further study and process. The following approaches are:
 
-- Time Series: We assume for every nature year, there is a pattern for the exception occurrence. We want to explore the trend throughout the year, both as a whole and for sepearate groups, to make predictions as a base. This will provide a general idea based on historial data.
+We intend to approach the problem with 3 methods, and will apply some/all of them based on further study and process. The following approaches are:
 
-- Linear Regression: We assume that the partner would like to know the exception situation for next month based on a certain period of data (like one week from today using 1 year’s data before today). In this case, we will generate a linear regression to see the relationship among certain predictors, such as the information of exception records for the next month that are already created.
+- Time Series: We assume for every nature year, there is a pattern for exception occurrences. We want to explore the trend throughout the year, both as a whole and for separate groups, to make predictions as a base. This will provide a general idea based on historical data.
 
-- Neural Network: Because our problem is to forecast time series data, neural networks may potentially be very helpful. We have seen that neural networks can be used in many applications in the world for problems ranging from driverless cars, to image recognition, and even for forecasting. The applications of neural networks as machine learning models has been dramatically increasing. Especially with LSTM models, we will be able to use a history of a sequence of data to “effectively” predict the future sequence. 
+- Linear Regression: We assume that the partner would like to know the exception situation for next month based on a certain period of data (for example, one week from today using 1 year’s data before today). In this case, we will generate a linear regression to see the relationship among certain predictors, such as the information of exception records for the next month that are already created.
+
+- Neural Network: Because our problem is to forecast time series data, neural networks may potentially be very helpful. We have seen that neural networks can be used in many applications in the world for problems ranging from driverless cars, to image recognition, and even for forecasting. The applications of neural networks as machine learning models has been dramatically increasing. Especially for time series data, perhaps using LSTMs can allow use to learn the history of a sequence of data to “effectively” predict sequence of future data.
 
 
 ### Timeline and Evaluation
@@ -67,5 +68,4 @@ We have following time schedule base on group discussion, and the actual process
 | Week 7 | Presentations and reports |
 
 
-### Feedback and discussion
-
+### Feedback and Discussion
