@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Foresting of Staffing Needs
 
 
@@ -56,7 +61,7 @@ We intend to approach the problem with 3 methods, applying some/all of them base
 We have the following time schedule based on group discussion, and the actual process may be updated due to the reality situation:
 
 | Time Period | Milestone |
-|-----------------|-------------|
+|-----------------|-------------------------------------------------------------------------------|
 | Week 1 | Review documentation, and finalize the proposal reports to mentor and partner |
 | Week 2 | Data wrangling, feature selection, EDA and implement baseline model |
 | Weeks 3 - 4 | Explore different approaches to fit the models |
