@@ -3,10 +3,9 @@
 
 April, 2019                               
 
-|Team member|
-|-------------|
-|[Marcelle Chiriboga](https://github.com/mchiriboga)|
-|[Luo Yang](https://github.com/lyiris22)|
+
+[Marcelle Chiriboga](https://github.com/mchiriboga)
+[Luo Yang](https://github.com/lyiris22)
 |[Patrick Tung](https://github.com/tungpatrick)|
 [Weifeng (Davy) Guo](https://github.com/DavyGuo)|
 
