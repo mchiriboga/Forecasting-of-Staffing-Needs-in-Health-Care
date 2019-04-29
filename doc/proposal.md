@@ -14,12 +14,12 @@ Mentored by [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 ### Project Summary
 
-The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage.
+The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care(PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage.
 
 
 ### Introduction
 
-Providence Health Care (PHC) is a government agency that operates 16 healthcare facilities in BC. For most positions in the healthcare business, any staffing leaves must always be filled in by another person. More than 70% of the operation costs in health care is for staffing, and the substitute caused by short notice leave usually cost more than regular staff. Hence, predicting the short-term staff needs could help PHC prepare for potential leave with short notice. Suggested by our partner, we will focus our target on the “operation level”, which has the time horizon that less than a month. "Operational" means that we must answer the question "how many back up staff do we need on a daily basis to maintain 100% staffing"
+Providence Health Care is a government agency that operates 16 healthcare facilities in BC. For most positions in the healthcare business, any staffing leaves must always be filled in by another person. More than 70% of the operation costs in health care is for staffing, and the substitute caused by short notice leave usually costs more than regular staff. Hence, predicting the short-term staff needs could help PHC prepare for potential leave with short notice. Suggested by our partner, we will focus our target on the “operation level”, which has the time horizon that less than a month. "Operational" means that we must answer the question "how many back up staff do we need on a daily basis to maintain 100% staffing"
 
 Based on the data provided by Providence, our identified problem of this project is “How many exception will happen for the next 30 days and what are the types of exceptions”. We plan to study the data first to identify potential features and labels. Then using the sample data, we plan to build and train the model to predict and test for accuracy. Once we have a model prototype, we will bring new details and update the data and model until we have reached a certain level.
 
