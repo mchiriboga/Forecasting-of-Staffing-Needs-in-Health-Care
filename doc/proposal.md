@@ -3,7 +3,7 @@
 
 April, 2019                               
 
-[Marcelle A. Chiriboga Carvalho](https://github.com/mchiriboga)
+[Marcelle Chiriboga](https://github.com/mchiriboga)
 
 [Luo Yang](https://github.com/lyiris22)
 
@@ -27,11 +27,11 @@ Based on the data provided by Providence, our identified problem of this project
 
 The final product will contain three component:
 
-- A data wrangling script in R or Python to help the partner clean the data
+- a dashboard (developed in R Shiny or Tableau);
 
-- A script that handles modeling process and generate final
+- the scripts containing the code used to proceed with the analysis
 
-- A dashboard to visualize the result using Shiny App (for now; will adjust to Tableau based on partner's preference)
+- a report outlining the methodologies and findings.
 
 
 ### Data Science Techniques
