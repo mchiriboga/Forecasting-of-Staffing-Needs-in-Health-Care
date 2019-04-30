@@ -24,3 +24,10 @@ for (y in years) {
   # write the splitted group to csv
   write.csv(output, file = paste("../data/raw_", y, ".csv", sep = ""))
 }
+
+# split the training set from 2012 to 2017
+train <- df %>% 
+  filter(year(SHIFT_DATE) < 2018) %>% 
+  arrange(SHIFT_DATE)
+# write training set to csv
+write.csv(train, file = "../data/train.csv")
