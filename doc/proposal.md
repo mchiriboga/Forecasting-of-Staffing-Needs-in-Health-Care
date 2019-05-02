@@ -1,4 +1,4 @@
-# Foresting of Staffing Needs
+# Forecasting of Staffing Needs
 
 
 April, 2019                               
@@ -10,6 +10,8 @@ Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 
 ### Executive Summary
+
+An increase in patients' waiting times at hospitals or the postponement of important procedures such as surgeries can be very critical, which is why most clinical health care positions should have a backup. On the other hand, overstaffing can result in significant operational costs for health care organizations. For this reason, accurately forecasting staffing needs can have a very positive impact both in the quality of care provided to patients, and in the cost efficiency of running a health care organization.
 
 The purpose of the project is to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage. The predictions will be made based on the historical records of schedule exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time or vacation, etc.
 
@@ -49,7 +51,7 @@ We are considering the following approaches for the problem:
 
 Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
 
-- **Neural Network:** After some extensive research, we realized that we could use sequence-to-sequence RNN architectures for problems regarding forecasting. We will train an LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks. 
+- **Neural Network:** After some extensive research, we realized that we could use sequence-to-sequence RNN architectures for problems regarding forecasting. We will train an LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks.
 
 
 ### Timeline and Evaluation
