@@ -35,7 +35,7 @@ The dataset consists of more than 2 millions records of exceptions since 2012, a
 
 After data wrangling, we will start with slightly general questions and then answer more specific questions. We will obtain a better understanding of the data and process and mature our models as the following steps:
 
-Step 1: How many exceptions will happen each week for the next four weeks?
+Step 1: How many total exceptions considering PHC as a whole will happen each week for the next four weeks?
 
 Step 2: How many exceptions will happen each week for the next four week with each exception group (e.g. vacation, maternity leave, sick time, etc)?
 
