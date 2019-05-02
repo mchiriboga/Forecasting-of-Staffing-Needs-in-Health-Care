@@ -41,13 +41,15 @@ Step 3: How many exceptions will happen each week for the next four weeks for ea
 
 Step 4: For each predicted exception, will it find a relief?
 
-We are considering the following three approaches for the problem:
+We are considering the following approaches for the problem:
 
-- **Time Series:** For this model, we assume that for every year, there is a pattern for exception occurrences. We will explore the trend throughout the years, both for all exceptions in aggregate, as for separate exception groups, in order to make predictions for each of the next four weeks. After we have the predicted exception, we will implement classification to label if the exception will find a relief or not.
+- **Time Series:** We observed that the number of exceptions show some regular changing patterns every year. We will decompose the trend and seasonalities using time series, both for the entire data set and for separate exception groups, to make predictions for the number of exceptions in future weeks. We will also implement classifications to label whether these exceptions can find a relief or not.
 
-- **Linear Regression:** We will fit a linear regression model to predict the number of exceptions for each one of the next four weeks based on the history of past exceptions and the known scheduled future exceptions.
+- **Linear Regression:** For the residuals in the decomposition of time series, we will use linear regression models to bring in new variables, such as temperature, to explain the pattern. The prediction of errors by regression models will be combined with the forecasting of time series to produce the final result.
 
-- **Neural Network:** After some extensive research, we realized that we could use sequence-to-sequence RNN architectures for problems regarding forecasting. We will train an LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks. Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
+Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
+
+- **Neural Network:** After some extensive research, we realized that we could use sequence-to-sequence RNN architectures for problems regarding forecasting. We will train an LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks. 
 
 
 ### Timeline and Evaluation
