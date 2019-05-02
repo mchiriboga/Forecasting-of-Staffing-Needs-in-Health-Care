@@ -11,17 +11,17 @@ Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 ### Executive Summary
 
-An increase in patients' waiting times at hospitals or the postponement of important procedures such as surgeries can be very critical, which is why most clinical health care positions must have backup. However, overstaffing can result in significant operational costs for health care organizations. For this reason, accurately forecasting staffing needs can have a very positive impact both in the quality of care provided to patients, and in the cost efficiency of running a health care organization.
+An increase in patients' waiting times at hospitals or the postponement of important procedures such as surgeries are known to be extremely critical, which is why hospitals try really hard to make sure that their clinical health care positions have backups at all times. However, overstaffing can result in significant operational costs for health care organizations. For this reason, accurately forecasting staffing needs can have a very positive impact both in the quality of care provided to patients, and in the cost efficiency of running a health care organization.
 
-The purpose of the project is to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage. The predictions will be made based on the historical records of schedule exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time or vacation, etc.
+The purpose of the project is to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions will be made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time or vacation, etc.
 
 ### Introduction
 
-For most positions in the healthcare business, any staff absences must always be filled with another person. More than 70% of the operation costs in health care are tied to staffing, and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
+For most positions in the healthcare business, any staff absences must always be filled in by another staff. More than 70% of the operation costs in health care are tied to staffing, and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
 
-PHC is a government agency that operates 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impact both in terms of cost to the organization as in quality of care provided to patients. Hence, it makes sense to predict future staffing needs to reach their best utilities, which enables intelligent hiring decisions both for permanent and temporary staff.
+PHC is a government agency that operates more than 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impacts both in terms of cost to the organization and in quality of care provided to patients. Hence, it makes sense to predict future staffing needs to reach their best utilities, which enables intelligent hiring decisions both for permanent and temporary staff.
 
-In this project, we are partnering with PHC to predict staff needs based in their historical scheduling data. As suggested by our partner, we will focus our predictions on the *operational level*, i.e. short term needs, specifically on a time horizon of less than a week. Based on the data provided by PHC, the question of this project  is “How many backup staff we need on a weekly basis to have a full staff for the next four weeks?”. We will start by exploring the data to identify potential features to be used for the predictions. Then, using a subset of the data provided, we will implement and train a set of different candidate models, which we will evaluate by comparing their predictions with actual known values. In the end, we will select the best model based on a combination of accuracy and interpretability.The final product will consist of three components:
+In this project, we are partnering with PHC to predict staff needs based in their historical scheduling data. As suggested by our partner, we will focus our predictions on the *operational level*, i.e. short term needs, specifically on a time horizon of less than a week. Based on the data provided by PHC, the question of this project  is “How many backup staff do we need on a weekly basis to have a full staff for the next four weeks?”. We will start by exploring the data to identify potential features to be used for the predictions. Then, using a subset of the data provided, we will implement and train a set of different candidate models, which we will evaluate by comparing their predictions with actual known values. In the end, we will select the best model based on a combination of accuracy and interpretability.The final product will consist of three components:
 
 - a dashboard (developed in R Shiny or Tableau),
 
@@ -31,9 +31,9 @@ In this project, we are partnering with PHC to predict staff needs based in thei
 
 ### Data Science Techniques
 
-The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc). Since raw dataset contains more than 50 columns, we will do data wrangling in order to process feature selection. We've found several features which has potential impact on the exception occurence, like notice period. There is an obvious difference between weekday exceptions and weekend exceptions which could indicate the weekday/weekend to be a feature for classification. We also noticed that different type of staff position could have an impact on exceptions as well as location/facility category.
+The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc). Since the raw dataset contains more than 50 columns, we will perform data wrangling in order to process feature selection. We have found several features which might potentially impact the exception occurrences, for example, notice period. Furthermore, there is an obvious difference between weekday exceptions and weekend exceptions which could indicate that weekday/weekend could be a feature. We also noticed that different types of staffing positions could have an impact on exceptions as well as their location/facility.
 
-After data wrangling, we will start with slightly general questions and then answer more specific questions. We will obtain a better understanding of the data and process and mature our models as the following steps:
+After wrangling the dataset, we will start with slightly general questions and then answer more specific questions. We will obtain a better understanding of the data and process and mature our models as the following steps:
 
 Step 1: How many total exceptions considering PHC as a whole will happen each week for the next four weeks?
 
@@ -41,7 +41,7 @@ Step 2: How many exceptions will happen each week for the next four week with ea
 
 Step 3: How many exceptions will happen each week for the next four weeks for each job family (physician, nurse, physiotherapist, etc)?
 
-Step 4: For each predicted exception, will it find a relief?
+Step 4: For each predicted exception, will PHC be able to find a relief?
 
 We are considering the following approaches for the problem:
 
