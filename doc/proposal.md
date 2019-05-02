@@ -25,9 +25,9 @@ Based on the data provided by Providence Health, the question this project will 
 
 The final product will consist of three components:
 
-- a dashboard (developed in R Shiny or Tableau);
+- a dashboard (developed in R Shiny or Tableau),
 
-- the scripts containing the code used to proceed with the analysis
+- the scripts containing the code used to proceed with the analysis,
 
 - a report outlining the methodologies and findings.
 
@@ -35,7 +35,7 @@ The final product will consist of three components:
 
 The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc).  
 
-We will start from more general questions and then answer more specific questions as we obtain a better understanding of the data and process and mature our models. For example:
+We will start with slightly general questions and then move on to answer more specific questions as we obtain a better understanding of the data and process and mature our models. For example:
 
 Step 1: How many exceptions will happen each week for the next four weeks?
 
@@ -49,9 +49,8 @@ We are considering the following three approaches for the problem:
 
 - **Linear Regression:** We will fit a linear regression model to predict the number of exceptions for each one of the next four weeks based on the history of past exceptions and the known scheduled future exceptions.
 
-- **Neural Network:** We will train a LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks.
+- **Neural Network:** After some extensive research, we realized that we could use sequence-to-sequence RNN architectures for problems regarding forecasting. We will train an LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks. Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
 
-Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
 
 ### Timeline and Evaluation
 
