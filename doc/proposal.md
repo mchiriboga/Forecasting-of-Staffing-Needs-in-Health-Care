@@ -11,14 +11,17 @@ Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 ### Executive Summary
 
-The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage.
-
+The purpose of the project is to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for potential cost rising and staff shortage. The predictions will be made based on the known history of schedule exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time or vacation, respectively.
 
 ### Introduction
 
-Providence Health Care is a government agency that operates 16 healthcare facilities in British Columbia. For most positions in the healthcare business, any staffing leaves must always be filled in by another person. More than 70% of the operation costs in health care is for staffing, and the substitute caused by short notice leave usually costs more than regular staff. Hence, predicting the short-term staffing needs could help PHC to prepare for potential leave with short notice. Suggested by our partner, we will focus our target on the *operation level*, which has the time horizon of that less than a month. *Operational* means that we must answer the question "how many back up staff do we need on a daily basis to maintain 100% staffing?"
+For most positions in the healthcare business, any staff absences must always be filled in by another person. More than 70% of the operation costs in health care are tied to staffing, and the costs of substituting absences on a short notice are usually significantly higher than regular staffing costs. Hence, predicting the short-term staffing needs in order to prepare for potential shortages can significantly improve the operational efficiency of healthcare institutions.
 
-Based on the data provided by Providence Health, our identified question of this project is “How many exceptions will happen for the next 30 days and what are the types of exceptions?”. We plan to explore the data first to identify potential features and labels. Then, using the sample data, we plan to build and train the model to predict and test for accuracy. Once we have a model prototype, we will bring new details and update the data and the model until we have reached a certain level.
+Providence Health Care is a government agency that operates 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impact both in terms of cost to the organization as in quality of care provided to patients. For these reasons, it makes sense to predict future staffing needs to the best of their ability, which enables intelligent hiring decisions both for permanent and temporary staff.
+
+In this project, we are partnering with PHC to predict staff needs based in their historical scheduling data. As suggested by our partner, we will focus our predictions on the *operational level*. i.e. short term needs, specifically on a time horizon of less than a month.
+
+Based on the data provided by Providence Health, the question this project will aim to answer is “How many backup staff we need on a weekly basis to have a full staff for the next four weeks?”. We will start by exploring the data to identify potential features to be used for the predictions. Then, using a subset of the data provided, we will implement and train a set of different candidate models, which we will evaluate by comparing their predictions with actual known values. In the end, we will select the best model based on a combination of accuracy and interpretability.
 
 The final product will consist of three components:
 
@@ -28,32 +31,31 @@ The final product will consist of three components:
 
 - a report outlining the methodologies and findings.
 
-
 ### Data Science Techniques
 
-The dataset consists of more than 2 millions records of exceptions since 2012, and we intend to split the raw data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system develop, etc).  
+The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc).  
 
-We will start from simple question with simple data and move forward once we achieve certain goal. The milestones for our problems are:
+We will start from more general questions and then answer more specific questions as we obtain a better understanding of the data and process and mature our models. For example:
 
-Step 1: How many exceptions will happen next month?
+Step 1: How many exceptions will happen each week for the next four weeks?
 
-Step 2: For those exceptions predicted, what kind of exception group they are?
+Step 2: How many exceptions will happen each week for the next four weeks for each exception group (e.g. vacation, maternity leave, sick time, etc)?
 
-Step 3: For those exception predicted, what kind of position they are?
+Step 3: How many exceptions will happen each week for the next four weeks for each job family (physician, nurse, physiotherapist, etc)?
 
+We are considering the following three approaches for the problem:
 
-We intend to approach the problem with 3 methods, applying some/all of them based on further study and process. The following approaches are:
+- **Time Series:** For this model, we assume that for every year, there is a pattern for exception occurrences. We will explore the trend throughout the years, both for all exceptions in aggregate, as for separate exception groups, in order to make predictions for each of the next four weeks.
 
-- **Time Series:** We assume for every nature year, there is a pattern for exception occurrences. We want to explore the trend throughout the years, both as a whole and for separate groups, to make predictions as a base. This will provide a general idea based on historical data.
+- **Linear Regression:** We will fit a linear regression model to predict the number of exceptions for each one of the next four weeks based on the history of past exceptions and the known scheduled future exceptions.
 
-- **Linear Regression:** We assume that the partner would like to know the exception situation for next month based on a certain period of data (for example, one week from today using 1 year’s data before today). In this case, we will generate a linear regression to see the relationship among certain predictors, such as the information of exception records for the next month that are already created.
+- **Neural Network:** We will train a LSTM model in order to learn the history of exceptions, and use that to make predictions of the number of exceptions for each of the next four weeks.
 
-- **Neural Network:** Because our problem is to forecast time series data, neural networks may potentially be very helpful. We have seen that neural networks can be used in many applications in the world for problems ranging from driverless cars, to image recognition, and even for forecasting. The applications of neural networks as machine learning models has been dramatically increasing. Especially for time series data, perhaps using LSTMs can allow use to learn the history of a sequence of data to “effectively” predict sequence of future data.
-
+Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
 
 ### Timeline and Evaluation
 
-We have the following time schedule based on group discussion, and the actual process may be updated due to the reality situation:
+Below is our proposed timeline for the project, as a starting point. The actual dates may be updated depending on whether particular activities turn out to be more or less time intensive than anticipated.
 
 | Time Period | Milestone |
 |-----------------|-------------------------------------------------------------------------------|
