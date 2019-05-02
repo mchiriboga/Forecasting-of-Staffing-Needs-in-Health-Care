@@ -43,7 +43,7 @@ Step 4: For each predicted exception, will it find a relief?
 
 We are considering the following three approaches for the problem:
 
-- **Time Series:** For this model, we assume that for every year, there is a pattern for exception occurrences. We will explore the trend throughout the years, both for all exceptions in aggregate, as for separate exception groups, in order to make predictions for each of the next four weeks. After have the predicted exception, we will implement classification to label if the exception will find a relief or not.
+- **Time Series:** For this model, we assume that for every year, there is a pattern for exception occurrences. We will explore the trend throughout the years, both for all exceptions in aggregate, as for separate exception groups, in order to make predictions for each of the next four weeks. After we have the predicted exception, we will implement classification to label if the exception will find a relief or not.
 
 - **Linear Regression:** We will fit a linear regression model to predict the number of exceptions for each one of the next four weeks based on the history of past exceptions and the known scheduled future exceptions.
 
