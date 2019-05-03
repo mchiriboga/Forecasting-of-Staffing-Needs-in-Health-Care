@@ -11,13 +11,13 @@ Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 ### Executive Summary
 
-An increase in patients' waiting times at hospitals or the postponement of important procedures such as surgeries are known to be extremely critical, which is why hospitals try really hard to make sure that their clinical health care positions have backups at all times. However, overstaffing can result in significant operational costs for health care organizations. For this reason, accurately forecasting staffing needs can have a very positive impact both in the quality of care provided to patients, and in the cost efficiency of running a health care organization.
+For most positions in the healthcare business, any staff absences must always be filled in by another staff and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
 
 The purpose of the project is to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions will be made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time or vacation, etc.
 
 ### Introduction
 
-For most positions in the healthcare business, any staff absences must always be filled in by another staff. More than 70% of the operation costs in health care are tied to staffing, and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
+An increase in patients' waiting times at hospitals or the postponement of important procedures, such as surgeries, are known to be extremely critical, which is why hospitals try to make sure that their clinical health care positions have backups at all times. On the other hand, more than 70% of the operation costs in health care are tied to staffing and, overstaffing can result in a significant increase in operational costs. For this reason, accurately forecasting staffing needs can have a very positive impact both in the quality of care provided to patients, and in the cost efficiency of running a health care organization.
 
 PHC is a government agency that operates more than 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impacts both in terms of cost to the organization and in quality of care provided to patients. Hence, it makes sense to predict future staffing needs to reach their best utilities, which enables intelligent hiring decisions both for permanent and temporary staff.
 
