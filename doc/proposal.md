@@ -31,7 +31,7 @@ In this project, we are partnering with PHC to predict staff needs based in thei
 
 ### Data Science Techniques
 
-The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc). Since the raw dataset contains more than 50 columns, we will perform data wrangling in order to process feature selection. We have found several features which might potentially impact the exception occurrences, for example, notice period. Furthermore, there is an obvious difference between weekday exceptions and weekend exceptions which could indicate that weekday/weekend could be a feature. We also noticed that different types of staffing positions could have an impact on exceptions as well as their location/facility.
+The dataset consists of more than 2 millions records of exceptions since 2012, and we will split the original data based on years. This way, not only will we have a smaller dataset to generate some insight from, but we will also be able to tell the difference caused by time (facility opening, system development, increases in staff size, etc). Since the raw dataset contains more than 50 columns (e.g., job family, exception group, site, etc), we will perform data wrangling in order to process feature selection. We have found several features which might potentially impact the exception occurrences, for example, notice period. Furthermore, there is an obvious difference between weekday exceptions and weekend exceptions which could indicate that weekday/weekend could be a feature. We also noticed that different types of staffing positions could have an impact on exceptions as well as their location/facility.
 
 After wrangling the dataset, we will start with slightly general questions and then answer more specific questions. We will obtain a better understanding of the data and process and mature our models as the following steps:
 
@@ -47,7 +47,7 @@ We are considering the following approaches for the problem:
 
 - **Time Series:** We observed that the number of exceptions show some regular changing patterns every year. We will decompose the trend and seasonalities using time series for both the entire data set and separate exception groups, to make predictions of the number of exceptions in future weeks. We will also implement classifications to label whether these exceptions can find a relief or not.
 
-- **Linear Regression:** For the residuals in the decomposition of time series, we will use linear regression models to bring in new variables, such as temperature, to explain the pattern. The prediction of errors by regression models will be combined with the forecasting of time series to produce the final result.
+- **Linear Regression:** For the residuals in the decomposition of time series, we will use linear regression models to bring in new variables to explain the pattern. The prediction of errors by regression models will be combined with the forecasting of time series to produce the final result.
 
 Initially, we will implement the first two (simpler) approaches, and move on to the Neural Network solution if we evaluate that the more complex model has the potential to yield better results.
 
