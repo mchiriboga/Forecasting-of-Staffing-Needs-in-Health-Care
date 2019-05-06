@@ -1,0 +1,76 @@
+---
+title: "EDA For Meeting"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(forecast))
+```
+
+## Introduction
+
+Explore the effect of smoothing in the peak weeks, by checking the percentage of the "Relief Not Found" and compare to the annual average.
+
+## Prepare Data
+
+```{r}
+df <- read_csv("../data/train.csv")
+```
+
+## Explore Peaks
+
+```{r}
+weekly <- df %>% 
+  mutate(week = week(SHIFT_DATE),
+         year = factor(year(SHIFT_DATE))) %>% 
+  group_by(year, week) %>% 
+  summarise(count = n()) %>%
+  filter(week < 53)  # remove the last week to avoid misleading
+
+weekly %>% 
+  ggplot() +
+  geom_line(aes(x = week, y = count, color = year),
+             size = 0.5) +
+  scale_color_discrete(name = "Year") +
+  labs(x = "Week of Year", y = "Number of Exceptions",
+       title = "Exception Records by Week for each Year") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Find the weeks with the most count in 2017.
+
+```{r}
+weekly %>%
+  filter(year == 2017) %>% 
+  arrange(desc(count)) %>% 
+  head(5)
+```
+
+## Smoothing Effect
+
+The average percentage of "Relief Not Found":
+
+```{r}
+df17 <- df %>% 
+  filter(year(SHIFT_DATE) == 2017) %>% 
+  mutate(relief = EARNING_CATEGORY == "Relief Not Found")
+
+# calculate the percentage
+sum(df17$relief)/nrow(df17)
+```
+
+Find the percentage of "Relief Not Found" in the peak weeks:
+
+```{r}
+df17 %>% 
+  mutate(week = week(SHIFT_DATE)) %>% 
+  group_by(week) %>% 
+  summarise(per = sum(relief)/n()) %>% 
+  filter(week %in% c(51,35,33,31,34))
+```
+
+Compare to the average, the peak weeks do not have a significant increase in the percentage of "Relief Not Found", except for the 51 week (Christmas).
