@@ -18,10 +18,9 @@ df <- read_csv("../data/exception_hours.csv")
 # split the training set from 2012 to 2017
 train <- df %>% 
   filter(year(SHIFT_DATE) < 2018) %>% 
-  arrange(SHIFT_DATE)
+  arrange(SHIFT_DATE) %>% 
+  # remove the exceptions that are cancelled
+  filter(!grepl('Cancelled by Unit|Cancelled by Scheduler', EXCEPTION_REASON))
 
 # write training set to csv
 write.csv(train, file = "../data/train.csv")
-
-# 
-df
