@@ -51,15 +51,15 @@ exception_and_productive_hours <- prod_hours %>%
 exception_and_productive_hours[c("total_exception_hours", "number_of_exceptions")][is.na(exception_and_productive_hours[c("total_exception_hours", "number_of_exceptions")])] <- 0
 ```
 
-## EDA
+## Exploratory Data Analisys (EDA)
 
 Let's first explore the data considering Providence Health Care as a whole, not making any distinction among facilities, program, and job families, for example.
 
-### Exception vs. Productive Hours
+#### Exception vs. Productive Hours
 
 Analyze the exceptions occurred from 2013 to 2017, contrasting them with the productive hours in order to see if there is a correlation between them.
 
-#### Monthly Analysis
+- **Monthly Analysis**
 
 ```{r data set - monthly basis}
 # Create a data set considering a monthly basis
@@ -103,7 +103,7 @@ dec_ts_excep_number_monthly <- decompose(ts_excep_number_monthly)
 plot(dec_ts_excep_number_monthly)
 ```
 
-#### Weekly Analysis
+- **Weekly Analysis**
 
 ```{r data set - weekly basis}
 # Create a data set considering a weekly basis
@@ -149,8 +149,9 @@ plot(dec_ts_excep_number_weekly)
 
 
 **Observations:**
-    - All analyses (monthly and weekly for productive hours, exception hours and number of exceptions) indicate an increasing trend over the years.
-    - The weekly analyses show that the seasonal component has a trough every year during week 52, i.e. much lower numbers for productive hours, exception hours and number of exceptions in comparison to other surrounding weeks.
+
+- All analyses (monthly and weekly for productive hours, exception hours and number of exceptions) indicate an increasing trend over the years.
+- The weekly analyses show that the seasonal component has a trough every year during week 52, i.e. much lower numbers for productive hours, exception hours and number of exceptions in comparison to other surrounding weeks.
 
 ```{r }
 excep_prod_hours_weekly %>% 
@@ -160,11 +161,11 @@ excep_prod_hours_weekly %>%
 - At a glance, the expectation would be for weeks with lower productive hours to have higher exceptions (number and/or hours). However, this doesn't seem to be true for week 52, as all values are lower than other weeks.
   - *Do holidays play a part in this? That is, do weeks that have holidays have lower productive hours, but also lower exceptions? Are holidays not taken into account in exceptions?*
 
-## Exploring the 'exception_hours' data set
+### Exploring the 'exception_hours' data set
 
 Now focusing only on the `exception_hours.csv`, let's explore how exceptions are distributed accross some of the variables.
 
-### SITE
+#### `SITE`
 
 ```{r}
 # Check the total number of exceptions by facilities
@@ -177,9 +178,10 @@ Now focusing only on the `exception_hours.csv`, let's explore how exceptions are
 ```
 
 **Observation:**
+
 - Considering the total number of exceptions from 2013 to 2017, `St Paul's Hospital`, `Mt St Joseph`, `Holy Family` are the top facilities, where `St Paul's Hospital` has ~5x more exceptions than the second facility, `Mt St Joseph`.
 
-### LABOR_AGREEMENT
+#### `LABOR_AGREEMENT`
 
 ```{r number of exceptions by labor agreement}
 # Rank the total number of exceptions by labor agreement
@@ -202,10 +204,11 @@ exception_hours %>%
 ```
 
 **Observations:**
+
 - Considering the total number of exceptions from 2013 to 2017, `FAC`, `NURS` and `PARMED` are the top 3 `LABOR_AGREEMENT`.
 - Most of the exceptions are from `St. Paul's Hospital`, where the majority are related to `NURS`. 
 
-### JOB_FAMILY_DESCRIPTION
+#### `JOB_FAMILY_DESCRIPTION`
 
 Exploring the `JOB_FAMILY_DESCRIPTION` of the main `LABOR_AGREEMENT`:
 
@@ -245,7 +248,7 @@ parmed_job_family <- exception_hours %>%
 head(parmed_job_family, 10)
 ```
 
-### EXCEPTION_GROUP
+#### `EXCEPTION_GROUP`
 
 - Considering all sites
 
@@ -276,8 +279,8 @@ sum(other_exception_reason$count) == exception_groups$count[exception_groups$EXC
 
 - Focusing on `St Paul's Hospital` `EXCEPTION_GROUP` to check if the main groups are the same as the ones considering PHC as a whole. 
 
-```{r St Paul's Hospital exception groups}
-# Check the St Paul's Hospital total number of exceptions by each exception group
+```{r St Pauls Hospital exception groups}
+# Check the St Pauls Hospital total number of exceptions by each exception group
 (exception_groups_st_paul <- exception_hours %>% 
   filter(SITE == "St Paul's Hospital") %>% 
   group_by(EXCEPTION_GROUP) %>% 
@@ -286,7 +289,7 @@ sum(other_exception_reason$count) == exception_groups$count[exception_groups$EXC
 )
 ```
 
-```{r St Paul's Hospital other exception reason}
+```{r St Pauls Hospital other exception reason}
 # Check the St Paul's Hospital total number of `Other` exceptions by each exception reason
 other_exception_reason_st_paul <- exception_hours %>% 
   filter(SITE == "St Paul's Hospital" & EXCEPTION_GROUP == "Other") %>% 
@@ -301,11 +304,13 @@ sum(other_exception_reason_st_paul$count) == exception_groups_st_paul$count[exce
 ```
 
 **Observations:**
-- Main `EXCEPTION_GROUP`:
-    - **PHC as a whole:** `Other` > `Vacation` > `Paid Sick` > `Swap`
-    - **`St. Paul’s Hospital`:**  `Other` > `Vacation` > `Swap` > `Workload`
-- EXCEPTION_REASON related to ‘Other’ EXCEPTION_GROUP
-    - **PHC as a whole:** `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`, `FTE- Flex Time Earned NC`
-    - **`St. Paul’s Hospital`:** `FTE- Flex Time Earned NC`, `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`
+
+1. Main `EXCEPTION_GROUP`:
+- PHC as a whole: `Other` > `Vacation` > `Paid Sick` > `Swap`
+- `St. Paul’s Hospital`:  `Other` > `Vacation` > `Swap` > `Workload`
+
+2. Main `EXCEPTION_REASON` related to `Other` `EXCEPTION_GROUP`
+- PHC as a whole: `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`, `FTE- Flex Time Earned NC`
+- `St. Paul’s Hospital`: `FTE- Flex Time Earned NC`, `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`
 
 
