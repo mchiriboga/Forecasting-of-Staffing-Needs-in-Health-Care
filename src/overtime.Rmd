@@ -1,0 +1,171 @@
+---
+title: "Overtime Pattern"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# packages
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(prophet))
+suppressPackageStartupMessages(library(MLmetrics))
+```
+
+## Introduction
+
+Explore the Overtime pattern.
+
+- `EARNING_CATEGORY` column: how the exception is filled
+- `Overtime` is included in this column.
+
+## Load Data
+
+```{r Load data}
+df <- read_csv("../data/train.csv")
+```
+
+## Overall Weekly Pattern
+
+```{r Overall: Weekly Analysis}
+# for each week, get the percentage of "Overtime" over all exceptions
+# ds: first day of that week
+overall <- df %>% 
+  mutate(ds = floor_date(SHIFT_DATE, unit = "week"), # first day of the week
+         overtime = EARNING_CATEGORY == "Overtime") %>% 
+  group_by(ds) %>% 
+  summarise(over = sum(overtime), total = n()) %>% 
+  mutate(y = over/total) %>% 
+  select(ds, y)
+
+## visualization
+overall %>% 
+  ggplot() +
+  geom_line(aes(x = week(ds), y = y, color = factor(year(ds))))
+```
+
+- Trend decrease from January, reach the bottom at around week 34.
+- From Week 34, increase till the end of the year.
+
+## Labor Agreement: Nurse
+
+First prepare data for the group of nurse: 
+
+```{r Nurse: data}
+nurse <- df %>% 
+  filter(LABOR_AGREEMENT == "NURS")
+
+# check the amount of data we have
+nrow(nurse)
+```
+
+```{r Nurse: EDA}
+# get the percentage of "Overtime" over all exceptions
+nurse_daily <- nurse %>% 
+  mutate(overtime = EARNING_CATEGORY == "Overtime") %>% 
+  group_by(SHIFT_DATE) %>% 
+  summarise(over = sum(overtime), total = n()) %>% 
+  mutate(y = over/total) %>% 
+  select(ds = SHIFT_DATE, y)
+
+# get the average percentage of a week
+# ds: first day of that week
+nurse_weekly <- nurse_daily %>% 
+  mutate(ds = floor_date(ds, unit = "week")) %>% 
+  group_by(ds) %>% 
+  summarise(y = mean(y))
+
+## visualization
+ggplot() +
+  geom_line(data = nurse_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+```
+
+```{r Nurse: Predict by Prophet}
+# split train and validate
+train <- nurse_daily %>% 
+  filter(year(ds) < 2017)
+
+# get the end date of training set
+end_date <- max(train$ds)
+
+# generate model
+m <- prophet(train, 
+             yearly.seasonality = TRUE,
+             interval.width = 0.62)
+  
+# predict
+future <- make_future_dataframe(m, periods = 365)
+prediction <- predict(m, future)
+```
+
+```{r Nurse: Prediction Results}
+pred_all <- prediction %>% 
+  mutate(ds = floor_date(ds, unit = "week")) %>% 
+  group_by(ds) %>% 
+  summarise(yhat = mean(yhat))
+
+val_all <- nurse_weekly %>% 
+  mutate(val_split = year(ds) == 2017)
+
+ggplot() +
+  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat)) +
+  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = val_split))
+```
+
+```{r}
+pred_17 <- pred_all %>% 
+  filter(ds > end_date)
+
+val_17 <- val_all %>% 
+  filter(ds > end_date) %>% 
+  select(ds, y)
+
+ggplot() +
+  geom_line(data = pred_17, aes(x = as.Date(ds), y = yhat, color = "Pred")) +
+  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val"))
+```
+
+```{r Nurse: Intervals}
+# Idea: Use Loess to get a smoothed interval
+
+pp <- pred_all %>% 
+  mutate(id = week(ds))
+
+ll <- loess(yhat ~ week(ds), data = pp, span = 0.3)
+out <- predict(ll)
+
+interval <- pred_all %>% 
+  mutate(upper = out + 0.03,
+         lower = out - 0.014)
+
+ggplot() +
+  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Val")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = yhat, color = "yhat")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = upper, color = "loess")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = lower, color = "loess"))
+```
+
+```{r Nurse: Accuracy}
+result <- interval %>% 
+  mutate(y = val_all$y) %>% 
+  filter(ds > end_date) 
+
+result %>% 
+  ggplot() +
+  geom_line(aes(x = ds, y = y, color = "y")) +
+  geom_line(aes(x = ds, y = yhat, color = "yhat")) +
+  geom_line(aes(x = ds, y = lower, color = "CI")) +
+  geom_line(aes(x = ds, y = upper, color = "CI"))
+
+result %>% 
+  mutate(test = y < upper & y > lower) %>% 
+  group_by() %>% 
+  summarise(sum = sum(test)) %>% 
+  mutate(accuracy = sum/nrow(result))
+```
+
+## Script
+
+Need to deal with:
+- Different time periods?
+- Input data form
