@@ -14,18 +14,29 @@ suppressPackageStartupMessages(library(MLmetrics))
 
 ## Introduction
 
-Explore the Overtime pattern.
+In this draft we explore the overtime pattern for the nurses. We consider the data related to the following two values:
 
-- `EARNING_CATEGORY` column: how the exception is filled
-- `Overtime` is included in this column.
+- `Overtime` in `EARNING_CATEGORY` column, indicating the excepted is backfilled by overtime, and
+- `NURS` in `LABOR_AGREEMENT` column, indicating the position is nurse.
+
+Since overtime backfill is expensive, we want to know the percentage of exception backfilled by "overtime" over the total number of exceptions, in order to take actions before hand. We use Facebook's Prophet model for predicting, and LOESS moving average for generating the intervals.
+
+As a result, for each week of the dates to be predicted, we give a predicted percentage and an interval with more than 90% confidence.
 
 ## Load Data
+
+For tuning the model, we use the training data, including the exceptions from end of 2012 to end of 2017.
 
 ```{r Load data}
 df <- read_csv("../data/train.csv")
 ```
 
 ## Overall Weekly Pattern
+
+Below is some EDA for the weekly pattern of overtime percentage. We can see there is some pattern in the graphs:
+
+- Trend decrease from January, reach the bottom at around week 34.
+- From Week 34, increase till the end of the year.
 
 ```{r Overall: Weekly Analysis}
 # for each week, get the percentage of "Overtime" over all exceptions
@@ -44,12 +55,9 @@ overall %>%
   geom_line(aes(x = week(ds), y = y, color = factor(year(ds))))
 ```
 
-- Trend decrease from January, reach the bottom at around week 34.
-- From Week 34, increase till the end of the year.
-
 ## Labor Agreement: Nurse
 
-First prepare data for the group of nurse: 
+First we prepare data for the group of nurse: 
 
 ```{r Nurse: data}
 nurse <- df %>% 
@@ -80,6 +88,8 @@ ggplot() +
   geom_line(data = nurse_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
 ```
 
+Then we make the prediction by Prophet.
+
 ```{r Nurse: Predict by Prophet}
 # split train and validate
 train <- nurse_daily %>% 
@@ -99,35 +109,42 @@ prediction <- predict(m, future)
 ```
 
 ```{r Nurse: Prediction Results}
+# aggregate the predicted result by week
 pred_all <- prediction %>% 
   mutate(ds = floor_date(ds, unit = "week")) %>% 
   group_by(ds) %>% 
   summarise(yhat = mean(yhat))
 
+# aggregate the validation data by week
 val_all <- nurse_weekly %>% 
-  mutate(val_split = year(ds) == 2017)
+  mutate(val_split = year(ds) >= 2017)
 
+# make a visualize of the predicted data we have
 ggplot() +
-  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat)) +
-  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = val_split))
+  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
+  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction"))
 ```
 
 ```{r}
+# make a visualization for the prediction period: 2017
 pred_17 <- pred_all %>% 
-  filter(ds > end_date)
+  filter(year(ds) > 2016)
 
 val_17 <- val_all %>% 
-  filter(ds > end_date) %>% 
+  filter(year(ds) > 2016) %>% 
   select(ds, y)
 
 ggplot() +
-  geom_line(data = pred_17, aes(x = as.Date(ds), y = yhat, color = "Pred")) +
-  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val"))
+  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val")) +
+  geom_line(data = pred_17, aes(x = as.Date(ds), y = yhat, color = "Pred"))
 ```
+
+We can see we have a pretty good prediction on the validation set.
+
+Besides, other that just a number, we also want to provide an interval for the prediction. We use LOESS moving average to smooth the prediction we have, and make adjustments to generate an interval.
 
 ```{r Nurse: Intervals}
 # Idea: Use Loess to get a smoothed interval
-
 pp <- pred_all %>% 
   mutate(id = week(ds))
 
@@ -138,6 +155,7 @@ interval <- pred_all %>%
   mutate(upper = out + 0.03,
          lower = out - 0.014)
 
+# visualize the intervals
 ggplot() +
   geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Val")) +
   geom_line(data = interval, aes(x = as.Date(ds), y = yhat, color = "yhat")) +
@@ -148,14 +166,7 @@ ggplot() +
 ```{r Nurse: Accuracy}
 result <- interval %>% 
   mutate(y = val_all$y) %>% 
-  filter(ds > end_date) 
-
-result %>% 
-  ggplot() +
-  geom_line(aes(x = ds, y = y, color = "y")) +
-  geom_line(aes(x = ds, y = yhat, color = "yhat")) +
-  geom_line(aes(x = ds, y = lower, color = "CI")) +
-  geom_line(aes(x = ds, y = upper, color = "CI"))
+  filter(year(ds) > 2016) 
 
 result %>% 
   mutate(test = y < upper & y > lower) %>% 
@@ -164,8 +175,13 @@ result %>%
   mutate(accuracy = sum/nrow(result))
 ```
 
-## Script
+The accuracy that the prediction falls in the interval on the validation set is around `96%`. However, the validation set is small, so the accuracy might not indicate that the accuracy will always be that high.
 
-Need to deal with:
-- Different time periods?
-- Input data form
+## Sample Output
+
+For the give dates, we have an prediction and an interval for each week.
+
+```{r}
+head(result)
+```
+
