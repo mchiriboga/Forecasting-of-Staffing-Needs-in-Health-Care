@@ -41,6 +41,20 @@ timeframe = pd.DataFrame(pd.date_range(start='2017-01-02', end='2017-12-31', fre
 
 # method for running prophet models
 def run_prophet(series, timeframe=timeframe):
+    """
+    Runs the Prophet 
+    
+    Key arguments:
+    --------------
+    series -- (DataFrame) time series data
+    timeframe -- (DataFrame) a DataFrame with one column 
+                 consisting of predicted dates
+
+    Returns: 
+    --------------
+    Returns the forecast of the predictions 
+
+    """
     model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=True, interval_width=0.95)
     model.fit(series)
     forecast = model.predict(timeframe)
