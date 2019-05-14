@@ -1,7 +1,7 @@
-EDA - Exploratory Data Analisys
+Exploratory Data Analysis
 ================
 Marcelle Chiriboga
-2019-05-01
+2019-05-13
 
 Load the Data
 -------------
@@ -19,202 +19,30 @@ In order to be able to analyze both tables together to compare expections with p
 ``` r
 # Aggregate the exceptions by PROGRAM, COST_CENTRE, JOB_FAMILY_DESCRIPTION, SHIFT_DATE, JOB_STATUS
 exception_hours_agg <- exception_hours %>% 
-  group_by(PROGRAM, COST_CENTRE, JOB_FAMILY_DESCRIPTION, SHIFT_DATE, JOB_STATUS) %>% 
-  summarise(total_exception_hours = sum(EXCEPTION_HOURS), number_of_exceptions = n())
+  group_by(PROGRAM, COST_CENTRE, JOB_FAMILY_DESCRIPTION,
+           SHIFT_DATE, JOB_STATUS) %>% 
+  summarise(total_exception_hours = sum(EXCEPTION_HOURS),
+            number_of_exceptions = n())
 
 # Join tables
 exception_and_productive_hours <- prod_hours %>% 
-  left_join(exception_hours_agg, by = c("PROGRAM", "COST_CENTRE", "JOB_FAMILY_DESCRIPTION", "SHIFT_DATE", "FULL_PART_TIME" = "JOB_STATUS")) %>% 
+  left_join(exception_hours_agg, by = c("PROGRAM", "COST_CENTRE",
+                                        "JOB_FAMILY_DESCRIPTION", "SHIFT_DATE",
+                                        "FULL_PART_TIME" = "JOB_STATUS")) %>% 
   # remove data from 2012, since we don't have exception info for this period
   filter(year(SHIFT_DATE) > 2012)
 
 # Replace NA values with 0
-exception_and_productive_hours[c("total_exception_hours", "number_of_exceptions")][is.na(exception_and_productive_hours[c("total_exception_hours", "number_of_exceptions")])] <- 0
+columns <- c("total_exception_hours","number_of_exceptions")
+exception_and_productive_hours[columns][is.na(exception_and_productive_hours[columns])] <- 0
 ```
 
-Exploratory Data Analisys (EDA)
+Exploratory Data Analysis (EDA)
 -------------------------------
 
-Let's first explore the data considering Providence Health Care as a whole, not making any distinction among facilities, program, and job families, for example.
-
-#### Exception vs. Productive Hours
-
-Analyze the exceptions occurred from 2013 to 2017, contrasting them with the productive hours in order to see if there is a correlation between them.
-
--   **Monthly Analysis**
-
-``` r
-# Create a data set considering a monthly basis
-excep_prod_hours_monthly <- exception_and_productive_hours %>%
-  # Consider the same window of the training set - data from 2013 to 2017
-  filter(year(SHIFT_DATE) < 2018) %>% 
-  # extract year and month
-  mutate(year = year(SHIFT_DATE),
-         month = month(SHIFT_DATE)) %>% 
-  group_by(year, month) %>% 
-  summarise(prod_hours = sum(WORKED_HRS), excep_hours = sum(total_exception_hours),total_exceptions = sum(number_of_exceptions))
-```
-
-``` r
-# Create monthly time series
-ts_prod_hours_monthly <- ts(excep_prod_hours_monthly$prod_hours, frequency = 12)
-ts_excep_hours_monthly <- ts(excep_prod_hours_monthly$excep_hours, frequency = 12)
-ts_excep_number_monthly <- ts(excep_prod_hours_monthly$total_exceptions, frequency = 12)
-```
-
-``` r
-# Plot the time series
-ts.plot(ts_prod_hours_monthly, ts_excep_hours_monthly, main = "Productive vs. Exceptions Hours (monthly)", xlab = "Year", ylab = "Hours")
-```
-
-![](eda_files/figure-markdown_github/time%20series%20visualization-1.png)
-
-``` r
-plot(ts_prod_hours_monthly, main = "Productive Hours (monthly)", xlab = "Year", ylab = "Hours")
-```
-
-![](eda_files/figure-markdown_github/time%20series%20visualization-2.png)
-
-``` r
-plot(ts_excep_hours_monthly, main = "Exceptions Hours (monthly)", xlab = "Year", ylab = "Hours")
-```
-
-![](eda_files/figure-markdown_github/time%20series%20visualization-3.png)
-
-``` r
-plot(ts_excep_number_monthly, main = "Number of Exceptions (monthly)", xlab = "Year", ylab = "Number of Exceptions")
-```
-
-![](eda_files/figure-markdown_github/time%20series%20visualization-4.png)
-
-``` r
-# Plot the decompositions
-# Productive hours
-dec_ts_prod_hours_monthly <- decompose(ts_prod_hours_monthly)
-plot(dec_ts_prod_hours_monthly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-1.png)
-
-``` r
-# Exception hours
-dec_ts_excep_hours_monthly <- decompose(ts_excep_hours_monthly)
-plot(dec_ts_excep_hours_monthly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-2.png)
-
-``` r
-# Total number of exceptions
-dec_ts_excep_number_monthly <- decompose(ts_excep_number_monthly)
-plot(dec_ts_excep_number_monthly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-3.png)
-
--   **Weekly Analysis**
-
-``` r
-# Create a data set considering a weekly basis
-excep_prod_hours_weekly <- exception_and_productive_hours %>%
-  # Consider the same window of the training set - data from 2013 to 2017
-  filter(year(SHIFT_DATE) < 2018) %>% 
-  # extract year and week
-  mutate(year = year(SHIFT_DATE),
-         week = week(SHIFT_DATE)) %>% 
-  group_by(year, week) %>% 
-  summarise(prod_hours = sum(WORKED_HRS),excep_hours = sum(total_exception_hours),total_exceptions = sum(number_of_exceptions)) %>% 
-  # remove the last week of each year (week 53), since they consider few days
-  filter(week != 53)
-```
-
-``` r
-# Create weekly time series
-ts_prod_hours_weekly <- ts(excep_prod_hours_weekly$prod_hours, start = c(2013, 1), frequency = 52)
-ts_excep_hours_weekly <- ts(excep_prod_hours_weekly$excep_hours, start = c(2013, 1), frequency = 52)
-ts_excep_number_weekly <- ts(excep_prod_hours_weekly$total_exceptions, start = c(2013, 1), frequency = 52)
-
-# Plot the time series
-ts.plot(ts_prod_hours_weekly, ts_excep_hours_weekly, main = "Productive Hours vs. Number of Exceptions - weekly")
-```
-
-![](eda_files/figure-markdown_github/weekly%20time%20series-1.png)
-
-``` r
-plot(ts_prod_hours_weekly, main = "Productive Hours (weekly)", xlab = "Year", ylab = "Hours")
-```
-
-![](eda_files/figure-markdown_github/weekly%20time%20series-2.png)
-
-``` r
-plot(ts_excep_hours_weekly, main = "Exceptions Hours (weekly)", xlab = "Year", ylab = "Hours")
-```
-
-![](eda_files/figure-markdown_github/weekly%20time%20series-3.png)
-
-``` r
-plot(ts_excep_number_weekly, main = "Number of Exceptions (weekly)", xlab = "Year", ylab = "Number of Exceptions")
-```
-
-![](eda_files/figure-markdown_github/weekly%20time%20series-4.png)
-
-``` r
-# Plot the decompositions
-# Productive hours
-dec_ts_prod_hours_weekly <- decompose(ts_prod_hours_weekly)
-plot(dec_ts_prod_hours_weekly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-1.png)
-
-``` r
-# Exception hours
-dec_ts_excep_hours_weekly <- decompose(ts_excep_hours_weekly)
-plot(dec_ts_excep_hours_weekly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-2.png)
-
-``` r
-# Total number of exceptions
-dec_ts_excep_number_weekly <- decompose(ts_excep_number_weekly)
-plot(dec_ts_excep_number_weekly)
-```
-
-![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-3.png)
-
-**Observations:**
-
--   All analyses (monthly and weekly for productive hours, exception hours and number of exceptions) indicate an increasing trend over the years.
--   The weekly analyses show that the seasonal component has a trough every year during week 52, i.e. much lower numbers for productive hours, exception hours and number of exceptions in comparison to other surrounding weeks.
-
-``` r
-excep_prod_hours_weekly %>% 
-  filter(week %in% c(50, 51, 52, 1, 2), !(week %in% c(1, 2) & year == 2013))
-```
-
-    ## # A tibble: 23 x 5
-    ## # Groups:   year [5]
-    ##     year  week prod_hours excep_hours total_exceptions
-    ##    <dbl> <dbl>      <dbl>       <dbl>            <dbl>
-    ##  1  2013    50     45577.       4818.              596
-    ##  2  2013    51     42356.       4766.              574
-    ##  3  2013    52     29639.       4011.              467
-    ##  4  2014     1     39126.       4414.              531
-    ##  5  2014     2     47063.       4602.              583
-    ##  6  2014    50     46329.       5370.              699
-    ##  7  2014    51     42251.       5131.              619
-    ##  8  2014    52     30295.       3977.              469
-    ##  9  2015     1     40492.       4360.              526
-    ## 10  2015     2     47767.       4658.              608
-    ## # ... with 13 more rows
-
--   At a glance, the expectation would be for weeks with lower productive hours to have higher exceptions (number and/or hours). However, this doesn't seem to be true for week 52, as all values are lower than other weeks.
--   *Do holidays play a part in this? That is, do weeks that have holidays have lower productive hours, but also lower exceptions? Are holidays not taken into account in exceptions?*
+First, lets focus only on the `exception_hours.csv`, exploring how exceptions are distributed accross some of the variables.
 
 ### Exploring the 'exception\_hours' data set
-
-Now focusing only on the `exception_hours.csv`, let's explore how exceptions are distributed accross some of the variables.
 
 #### `SITE`
 
@@ -222,7 +50,10 @@ Now focusing only on the `exception_hours.csv`, let's explore how exceptions are
 # Check the total number of exceptions by facilities
 (facilities <- exception_hours %>% 
   group_by(SITE) %>% 
-  filter(SITE %in% c("Billable", "Brock Fahrni", "Holy Family", "Mt St Joseph", "PHC Corporate", "St John Hospice", "St Paul's Hospital", "SVH Honoria Conway", "SVH Langara", "Youville Residence")) %>%
+  filter(SITE %in% c("Billable", "Brock Fahrni", "Holy Family",
+                     "Mt St Joseph", "PHC Corporate", "St John Hospice",
+                     "St Paul's Hospital", "SVH Honoria Conway", "SVH Langara",
+                     "Youville Residence")) %>%
   summarise(count = n()) %>% 
   arrange(desc(count))
  )
@@ -245,6 +76,8 @@ Now focusing only on the `exception_hours.csv`, let's explore how exceptions are
 **Observation:**
 
 -   Considering the total number of exceptions from 2013 to 2017, `St Paul's Hospital`, `Mt St Joseph`, `Holy Family` are the top facilities, where `St Paul's Hospital` has ~5x more exceptions than the second facility, `Mt St Joseph`.
+
+**We're focusing on the 10 facilities which include `LABOR_AGREEMENT = NURS`. Do we need to include any others?**
 
 #### `LABOR_AGREEMENT`
 
@@ -270,13 +103,22 @@ Now focusing only on the `exception_hours.csv`, let's explore how exceptions are
 ``` r
 # Visualize the total number of exceptions by labor agreement facetting by site
 exception_hours %>%
-  filter(!(LABOR_AGREEMENT %in% c('NULL', '0')), SITE %in% c("Billable", "Brock Fahrni", "Holy Family", "Mt St Joseph", "PHC Corporate", "St John Hospice", "St Paul's Hospital", "SVH Honoria Conway", "SVH Langara", "Youville Residence")) %>%
-  ggplot(aes(x = LABOR_AGREEMENT)) +
+  filter(!(LABOR_AGREEMENT %in% c('NULL', '0')), SITE %in% c("Billable", "Brock Fahrni",
+                                                             "Holy Family", "Mt St Joseph",
+                                                             "PHC Corporate",
+                                                             "St John Hospice",
+                                                             "St Paul's Hospital",
+                                                             "SVH Honoria Conway",
+                                                             "SVH Langara", 
+                                                             "Youville Residence")) %>%
+  ggplot(aes(x = LABOR_AGREEMENT, fill = LABOR_AGREEMENT)) +
   geom_bar(stat = "count") +
   facet_wrap(~SITE) +
   theme_bw() +
-    ggtitle("Number of Exceptions by Labor Agreement per Site (2013 - 2017)") +
-    theme(plot.title = element_text(hjust = 0.5))
+  ggtitle("Number of Exceptions by Labor Agreement per Site (2013 - 2017)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 0.5, vjust = 0.5)) +
+  labs(x = "", y = "Count", fill = "")
 ```
 
 ![](eda_files/figure-markdown_github/number%20of%20exceptions%20by%20labor%20agreement-1.png)
@@ -286,9 +128,13 @@ exception_hours %>%
 -   Considering the total number of exceptions from 2013 to 2017, `FAC`, `NURS` and `PARMED` are the top 3 `LABOR_AGREEMENT`.
 -   Most of the exceptions are from `St. Paul's Hospital`, where the majority are related to `NURS`.
 
+**Should we focus only on the top three `LABOR_AGREEMENT`? Or is there value to analyzing all of the groups, even the less representative ones?**
+
 #### `JOB_FAMILY_DESCRIPTION`
 
 Exploring the `JOB_FAMILY_DESCRIPTION` of the main `LABOR_AGREEMENT`:
+
+-   `FAC` job families (top 10)
 
 ``` r
 # FAC job families
@@ -316,6 +162,8 @@ head(fac_job_family, 10)
     ##  9 Therapy Aide                6237
     ## 10 Clerical Health Records     5761
 
+-   `NURS` job families (top 10)
+
 ``` r
 # NURS job families
 nurs_job_family <- exception_hours %>% 
@@ -341,6 +189,8 @@ head(nurs_job_family, 10)
     ##  8 Employed Student Nurse       517
     ##  9 Registered Nurse-CH1         369
     ## 10 Excluded Staff               268
+
+-   `PARMED` job families (top 10)
 
 ``` r
 # PARMED job families
@@ -427,13 +277,6 @@ head(other_exception_reason, 10)
     ##  9 Swap shifts - MV- Move            3605
     ## 10 ODO- OT on a day off (paid        3423
 
-``` r
-# Check the total number of other exceptions
-sum(other_exception_reason$count) == exception_groups$count[exception_groups$EXCEPTION_GROUP == 'Other']
-```
-
-    ## [1] TRUE
-
 -   Focusing on `St Paul's Hospital` `EXCEPTION_GROUP` to check if the main groups are the same as the ones considering PHC as a whole.
 
 ``` r
@@ -490,21 +333,328 @@ head(other_exception_reason_st_paul, 10)
     ##  9 BGX- OT Bank Meeting 1x           2315
     ## 10 REG- Working Off Site             1964
 
-``` r
-# Check the total number of other exceptions
-sum(other_exception_reason_st_paul$count) == exception_groups_st_paul$count[exception_groups$EXCEPTION_GROUP == 'Other']
-```
-
-    ## [1] TRUE
-
 **Observations:**
 
-1.  Main `EXCEPTION_GROUP`:
+Top `EXCEPTION_GROUP` by number of exceptions:
 
 -   PHC as a whole: `Other` &gt; `Vacation` &gt; `Paid Sick` &gt; `Swap`
 -   `St. Paul’s Hospital`: `Other` &gt; `Vacation` &gt; `Swap` &gt; `Workload`
 
-1.  Main `EXCEPTION_REASON` related to `Other` `EXCEPTION_GROUP`
+Top `EXCEPTION_REASON` related to `Other` `EXCEPTION_GROUP`:
 
 -   PHC as a whole: `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`, `FTE- Flex Time Earned NC`
 -   `St. Paul’s Hospital`: `FTE- Flex Time Earned NC`, `REG- Regular Hrs - MV- Move`, `PVC- Vacation Regular - MV- Move`, `REG- Regular Hrs`
+
+**Given `Other` is the top 1 `EXCEPTION_GROUP`, and since the `EXCEPTION_REASON` associated seem to, in several cases, fit into one or more of the other existing `EXCEPTION_GROUP`, should we attempt to recategorize some of these exceptions?**
+
+### St Paul's Hospital - Vacation
+
+Analyze `Vacation` and Sickness ('Paid Sick', 'Unpaid Sick', 'Relief Sick') `EXCEPTION_GROUP` from `St Paul's Hospital`.
+
+``` r
+# Create a dataset for St Paul's Hospital Vacation
+(vacation_weekly <- exception_hours %>% 
+  filter(SITE == "St Paul's Hospital", EXCEPTION_GROUP == 'Vacation') %>% 
+  # extract year and week
+  mutate(year = year(SHIFT_DATE),
+         week = week(SHIFT_DATE)) %>% 
+  group_by(year, week) %>%
+  summarise(count = n()) %>% 
+  # remove the last week of each year (week 53), since they consider few days
+  filter(week != 53)
+)
+```
+
+    ## # A tibble: 260 x 3
+    ## # Groups:   year [5]
+    ##     year  week count
+    ##    <dbl> <dbl> <int>
+    ##  1  2013     1   296
+    ##  2  2013     2   172
+    ##  3  2013     3   134
+    ##  4  2013     4   126
+    ##  5  2013     5   137
+    ##  6  2013     6   142
+    ##  7  2013     7   198
+    ##  8  2013     8   174
+    ##  9  2013     9   128
+    ## 10  2013    10   150
+    ## # … with 250 more rows
+
+``` r
+# Create a dataset for sick
+(sick_weekly <- exception_hours %>% 
+  filter(SITE == "St Paul's Hospital",
+         EXCEPTION_GROUP %in% c('Paid Sick', 'Unpaid Sick', 'Relief Sick')) %>% 
+    # extract year and week
+  mutate(year = year(SHIFT_DATE),
+         week = week(SHIFT_DATE)) %>% 
+  group_by(year, week) %>%
+  summarise(count = n()) %>% 
+  # remove the last week of each year (week 53), since they consider few days
+  filter(week != 53)
+)
+```
+
+    ## # A tibble: 260 x 3
+    ## # Groups:   year [5]
+    ##     year  week count
+    ##    <dbl> <dbl> <int>
+    ##  1  2013     1   199
+    ##  2  2013     2   241
+    ##  3  2013     3   271
+    ##  4  2013     4   235
+    ##  5  2013     5   189
+    ##  6  2013     6   153
+    ##  7  2013     7   187
+    ##  8  2013     8   227
+    ##  9  2013     9   227
+    ## 10  2013    10   187
+    ## # … with 250 more rows
+
+``` r
+# Create daily time series for different exception groups
+ts_vacation_weekly <- ts(vacation_weekly$count, frequency = 52)
+ts_sick_weekly <- ts(sick_weekly$count, frequency = 52)
+
+# Plot the time series
+plot(ts_vacation_weekly, xlab = "Year", ylab = "Number of Exceptions", 
+     main = "Number of Exceptions (Vacation) per Week")
+```
+
+![](eda_files/figure-markdown_github/vacation%20and%20sickness%20weekly%20time%20series-1.png)
+
+``` r
+plot(ts_sick_weekly, xlab = "Year", ylab = "Number of Exceptions", 
+     main = "Number of Exceptions (Sickness) per Week")
+```
+
+![](eda_files/figure-markdown_github/vacation%20and%20sickness%20weekly%20time%20series-2.png)
+
+``` r
+dec_ts_vacation_weekly <- decompose(ts_vacation_weekly)
+dec_ts_sick_weekly <- decompose(ts_sick_weekly)
+
+# Plot the decompositions
+# Vacation
+plot(dec_ts_vacation_weekly)
+```
+
+![](eda_files/figure-markdown_github/decompose-1.png)
+
+``` r
+# Sickness
+plot(dec_ts_sick_weekly)
+```
+
+![](eda_files/figure-markdown_github/decompose-2.png)
+
+**Observations:**
+
+Looking at the trend components for both vacation and sickness we notice:
+
+-   Vacation decreases significantly in 2014 and continues with a smaller trend in 2015, picking up again in 2016
+-   Sickness shows a slight initial trend decrease, followed by an increase over the years.
+
+Let's explore now the data for both Exception and Productive Hours
+
+#### Exception vs. Productive Hours
+
+Considering first Providence Health Care as a whole, not making any distinction among facilities, program, and job families, for example.
+
+Analyze the exceptions occurred from 2013 to 2017, contrasting them with the productive hours in order to see if there is a correlation between them.
+
+-   **Monthly Analysis**
+
+``` r
+# Create a data set considering a monthly basis
+excep_prod_hours_monthly <- exception_and_productive_hours %>%
+  # Consider the same window of the training set - data from 2013 to 2017
+  filter(year(SHIFT_DATE) < 2018) %>% 
+  # extract year and month
+  mutate(year = year(SHIFT_DATE),
+         month = month(SHIFT_DATE)) %>% 
+  group_by(year, month) %>% 
+  summarise(prod_hours = sum(WORKED_HRS), 
+            excep_hours = sum(total_exception_hours),
+            total_exceptions = sum(number_of_exceptions))
+```
+
+``` r
+# Create monthly time series
+ts_prod_hours_monthly <- ts(excep_prod_hours_monthly$prod_hours, frequency = 12)
+ts_excep_hours_monthly <- ts(excep_prod_hours_monthly$excep_hours, frequency = 12)
+ts_excep_number_monthly <- ts(excep_prod_hours_monthly$total_exceptions, frequency = 12)
+```
+
+``` r
+# Plot the time series
+ts.plot(ts_prod_hours_monthly, ts_excep_hours_monthly, 
+        main = "Productive vs. Exceptions Hours (monthly)", xlab = "Year", ylab = "Hours")
+```
+
+![](eda_files/figure-markdown_github/time%20series%20visualization-1.png)
+
+``` r
+plot(ts_prod_hours_monthly, main = "Productive Hours (monthly)", xlab = "Year", ylab = "Hours")
+```
+
+![](eda_files/figure-markdown_github/time%20series%20visualization-2.png)
+
+``` r
+plot(ts_excep_hours_monthly, main = "Exceptions Hours (monthly)", xlab = "Year", ylab = "Hours")
+```
+
+![](eda_files/figure-markdown_github/time%20series%20visualization-3.png)
+
+``` r
+plot(ts_excep_number_monthly, main = "Number of Exceptions (monthly)", 
+     xlab = "Year", ylab = "Number of Exceptions")
+```
+
+![](eda_files/figure-markdown_github/time%20series%20visualization-4.png)
+
+``` r
+# Plot the decompositions
+# Productive hours
+dec_ts_prod_hours_monthly <- decompose(ts_prod_hours_monthly)
+plot(dec_ts_prod_hours_monthly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-1.png)
+
+``` r
+# Exception hours
+dec_ts_excep_hours_monthly <- decompose(ts_excep_hours_monthly)
+plot(dec_ts_excep_hours_monthly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-2.png)
+
+``` r
+# Total number of exceptions
+dec_ts_excep_number_monthly <- decompose(ts_excep_number_monthly)
+plot(dec_ts_excep_number_monthly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20monthly%20decompositions-3.png)
+
+-   **Weekly Analysis**
+
+``` r
+# Create a data set considering a weekly basis
+excep_prod_hours_weekly <- exception_and_productive_hours %>%
+  # Consider the same window of the training set - data from 2013 to 2017
+  filter(year(SHIFT_DATE) < 2018) %>% 
+  # extract year and week
+  mutate(year = year(SHIFT_DATE),
+         week = week(SHIFT_DATE)) %>% 
+  group_by(year, week) %>% 
+  summarise(prod_hours = sum(WORKED_HRS),
+            excep_hours = sum(total_exception_hours),
+            total_exceptions = sum(number_of_exceptions)) %>% 
+  # remove the last week of each year (week 53), since they consider few days
+  filter(week != 53)
+```
+
+``` r
+# Create weekly time series
+ts_prod_hours_weekly <- ts(excep_prod_hours_weekly$prod_hours, 
+                           start = c(2013, 1), 
+                           frequency = 52)
+ts_excep_hours_weekly <- ts(excep_prod_hours_weekly$excep_hours,
+                            start = c(2013, 1), 
+                            frequency = 52)
+ts_excep_number_weekly <- ts(excep_prod_hours_weekly$total_exceptions, 
+                             start = c(2013, 1), 
+                             frequency = 52)
+
+# Plot the time series
+ts.plot(ts_prod_hours_weekly, 
+        ts_excep_hours_weekly,
+        main = "Productive Hours vs. Number of Exceptions - weekly")
+```
+
+![](eda_files/figure-markdown_github/weekly%20time%20series-1.png)
+
+``` r
+plot(ts_prod_hours_weekly, 
+     main = "Productive Hours (weekly)", 
+     xlab = "Year", 
+     ylab = "Hours")
+```
+
+![](eda_files/figure-markdown_github/weekly%20time%20series-2.png)
+
+``` r
+plot(ts_excep_hours_weekly, 
+     main = "Exceptions Hours (weekly)", 
+     xlab = "Year", 
+     ylab = "Hours")
+```
+
+![](eda_files/figure-markdown_github/weekly%20time%20series-3.png)
+
+``` r
+plot(ts_excep_number_weekly, 
+     main = "Number of Exceptions (weekly)", 
+     xlab = "Year", 
+     ylab = "Number of Exceptions")
+```
+
+![](eda_files/figure-markdown_github/weekly%20time%20series-4.png)
+
+``` r
+# Plot the decompositions
+# Productive hours
+dec_ts_prod_hours_weekly <- decompose(ts_prod_hours_weekly)
+plot(dec_ts_prod_hours_weekly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-1.png)
+
+``` r
+# Exception hours
+dec_ts_excep_hours_weekly <- decompose(ts_excep_hours_weekly)
+plot(dec_ts_excep_hours_weekly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-2.png)
+
+``` r
+# Total number of exceptions
+dec_ts_excep_number_weekly <- decompose(ts_excep_number_weekly)
+plot(dec_ts_excep_number_weekly)
+```
+
+![](eda_files/figure-markdown_github/plot%20the%20weekly%20decompositions-3.png)
+
+**Observations:**
+
+-   All analyses (monthly and weekly for productive hours, exception hours and number of exceptions) indicate an increasing trend over the years.
+-   The weekly analyses show that the seasonal component has a trough every year during week 52, i.e. much lower numbers for productive hours, exception hours and number of exceptions in comparison to other surrounding weeks.
+
+``` r
+excep_prod_hours_weekly %>% 
+  filter(week %in% c(50, 51, 52, 1, 2), !(week %in% c(1, 2) & year == 2013))
+```
+
+    ## # A tibble: 23 x 5
+    ## # Groups:   year [5]
+    ##     year  week prod_hours excep_hours total_exceptions
+    ##    <dbl> <dbl>      <dbl>       <dbl>            <dbl>
+    ##  1  2013    50     45577.       4818.              596
+    ##  2  2013    51     42356.       4766.              574
+    ##  3  2013    52     29639.       4011.              467
+    ##  4  2014     1     39126.       4414.              531
+    ##  5  2014     2     47063.       4602.              583
+    ##  6  2014    50     46329.       5370.              699
+    ##  7  2014    51     42251.       5131.              619
+    ##  8  2014    52     30295.       3977.              469
+    ##  9  2015     1     40492.       4360.              526
+    ## 10  2015     2     47767.       4658.              608
+    ## # … with 13 more rows
+
+-   At a glance, the expectation would be for weeks with lower productive hours to have higher exceptions (number and/or hours). However, this doesn't seem to be true for week 52, as all values are lower than other weeks.
+
+**Do holidays play a part in this? That is, do weeks that have holidays have lower productive hours, but also lower exceptions? Are holidays not taken into account in exceptions?**
