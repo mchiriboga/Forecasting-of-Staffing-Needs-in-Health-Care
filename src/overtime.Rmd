@@ -129,9 +129,17 @@ val_all <- nurse_weekly %>%
   mutate(val_split = year(ds) >= 2017)
 
 # make a visualize of the predicted data we have
-ggplot() +
+(p <- ggplot() +
   geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
-  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction"))
+  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction")) +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Percentage",
+       title = "Labor Agreement: Nurse") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_nurs_pred_1.jpg", p, width = 8, height = 4)
 ```
 
 ```{r}
@@ -150,6 +158,11 @@ ggplot() +
 
 We can see we have a pretty good prediction on the validation set.
 
+```{r Nurse: MAE}
+MAE(pred_17$yhat, val_17$y)
+```
+
+
 Besides, other that just a number, we also want to provide an interval for the prediction. We use LOESS moving average to smooth the prediction we have, and make adjustments to generate an interval.
 
 ```{r Nurse: Intervals}
@@ -165,11 +178,19 @@ interval <- pred_all %>%
          lower = out - 0.014)
 
 # visualize the intervals
-ggplot() +
-  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Val")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = yhat, color = "yhat")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = upper, color = "loess")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = lower, color = "loess"))
+(p <- ggplot() +
+  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = yhat, color = "Prediction")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = upper, color = "CI")) +
+  geom_line(data = interval, aes(x = as.Date(ds), y = lower, color = "CI")) +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Percentage",
+       title = "Labor Agreement: Nurse") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_nurs_pred_2.jpg", p, width = 8, height = 4)
 ```
 
 ```{r Nurse: Accuracy}
@@ -257,9 +278,17 @@ val_all <- dc1_weekly %>%
   filter(ds < as.Date("2017-12-31"))
 
 # make a visualize of the predicted data we have
-ggplot() +
+(p <- ggplot() +
   geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
-  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction"))
+  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction")) +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Percentage",
+       title = "Job Family: Registered Nurse-DC1") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc1_pred_1.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC: Prediction 2017}
@@ -274,6 +303,10 @@ val_17 <- val_all %>%
 ggplot() +
   geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val")) +
   geom_line(data = pred_17, aes(x = as.Date(ds), y = yhat, color = "Pred"))
+```
+
+```{r DC1: MAE}
+MAE(pred_17$yhat, val_17$y)
 ```
 
 ```{r DC1: Intervals}
@@ -301,11 +334,19 @@ interval_17 <- interval %>%
   filter(year(ds) > 2016)
 
 # visualize the intervals
-ggplot() +
-  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val")) +
-  geom_line(data = interval_17, aes(x = as.Date(ds), y = yhat, color = "yhat")) +
-  geom_line(data = interval_17, aes(x = as.Date(ds), y = upper, color = "loess")) +
-  geom_line(data = interval_17, aes(x = as.Date(ds), y = lower, color = "loess"))
+(p <- ggplot() +
+  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
+  geom_line(data = interval_17, aes(x = as.Date(ds), y = yhat, color = "Prediction")) +
+  geom_line(data = interval_17, aes(x = as.Date(ds), y = upper, color = "CI")) +
+  geom_line(data = interval_17, aes(x = as.Date(ds), y = lower, color = "CI")) +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Percentage",
+       title = "Job Family: Registered Nurse-DC1") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc1_pred_2.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC1: Accuracy}
@@ -358,8 +399,16 @@ dc2a_weekly <- dc2a_daily %>%
   summarise(y = sum(y))
 
 ## visualization
-ggplot() +
-  geom_line(data = dc2a_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+(p <- ggplot() +
+  geom_line(data = dc2a_weekly, aes(x = week(ds), y = y, color = factor(year(ds)))) +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Number",
+       title = "Job Family: Registered Nurse-DC2A") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc2a_all.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC2A: Weekly Interval}
@@ -423,13 +472,23 @@ dc2a_sph_weekly <- dc2a_sph_daily %>%
   summarise(y = sum(y))
 
 ## visualization
-ggplot() +
-  geom_jitter(data = dc2a_sph_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+(p <- ggplot() +
+  geom_jitter(data = dc2a_sph_weekly, aes(x = week(ds), y = y, color = factor(year(ds)))) +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 50), color = "red") +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 20), color = "red") +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Number",
+       title = "Nurse-DC2A at St Paul's Hospital") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc2a_sph.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC2A: Weekly Interval, SPH}
 dc2a_sph_weekly %>% 
-  mutate(test = y < 56 & y > 20) %>% 
+  mutate(test = y < 50 & y > 20) %>% 
   group_by() %>% 
   summarise(sum = sum(test)) %>% 
   mutate(accuracy = sum/nrow(dc2a_sph_weekly))
@@ -456,13 +515,23 @@ dc2a_msj_weekly <- dc2a_msj_daily %>%
   summarise(y = sum(y))
 
 ## visualization
-ggplot() +
-  geom_jitter(data = dc2a_sph_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+(p <- ggplot() +
+  geom_jitter(data = dc2a_msj_weekly, aes(x = week(ds), y = y, color = factor(year(ds)))) +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 10), color = "red") +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 0), color = "red") +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Number",
+       title = "Nurse-DC2A at Mt St Joseph") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc2a_msj.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC2A: Weekly Interval, MSJ}
 dc2a_msj_weekly %>% 
-  mutate(test = y < 11) %>% 
+  mutate(test = y < 10) %>% 
   group_by() %>% 
   summarise(sum = sum(test)) %>% 
   mutate(accuracy = sum/nrow(dc2a_sph_weekly))
@@ -490,13 +559,23 @@ dc2a_other_weekly <- dc2a_other_daily %>%
   summarise(y = sum(y))
 
 ## visualization
-ggplot() +
-  geom_jitter(data = dc2a_other_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+(p <- ggplot() +
+  geom_jitter(data = dc2a_other_weekly, aes(x = week(ds), y = y, color = factor(year(ds)))) +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 4), color = "red") +
+  geom_line(data = dc2a_sph_weekly, aes(x = week(ds), y = 0), color = "red") +
+  scale_color_discrete(name = "") +
+  labs(x = "Date", y = "Overtime Number",
+       title = "Nurse-DC2A at Other Sites") +
+  theme(plot.title = element_text(hjust = 0.5))
+)
+
+# save graph
+ggsave("../imgs/overtime/over_dc2a_other.jpg", p, width = 8, height = 4)
 ```
 
 ```{r DC2A: Weekly Interval, Other}
 dc2a_other_weekly %>% 
-  mutate(test = y < 5) %>% 
+  mutate(test = y < 4) %>% 
   group_by() %>% 
   summarise(sum = sum(test)) %>% 
   mutate(accuracy = sum/nrow(dc2a_other_weekly))
