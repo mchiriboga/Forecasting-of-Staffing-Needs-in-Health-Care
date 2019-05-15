@@ -16,7 +16,6 @@ small_train = train[(train["SITE"]=="St Paul's Hospital") |
                     (train["SITE"]=="Mt St Joseph") | 
                     (train["SITE"]=="Holy Family") | 
                     (train["SITE"]=="SVH Langara") | 
-                    (train["SITE"]=="PCH Corporate") | 
                     (train["SITE"]=="Brock Fahrni") | 
                     (train["SITE"]=="Youville Residence")]
 
@@ -24,20 +23,19 @@ small_val = val[(val["SITE"]=="St Paul's Hospital") |
                 (val["SITE"]=="Mt St Joseph") | 
                 (val["SITE"]=="Holy Family") | 
                 (val["SITE"]=="SVH Langara") | 
-                (val["SITE"]=="PCH Corporate") | 
                 (val["SITE"]=="Brock Fahrni") | 
                 (val["SITE"]=="Youville Residence")]
 
 # create training dataframes
-splitting_train = small_train.groupby(["LABOR_AGREEMENT", "SITE", "SHIFT_DATE"]).size().reset_index()
+splitting_train = small_train.groupby(["JOB_FAMILY_DESCRIPTION", "SITE", "SHIFT_DATE"]).size().reset_index()
 splitting_train = splitting_train.rename({"SHIFT_DATE":"ds", 0:"y"}, axis=1)
 
 # create validation dataframes
-splitting_val = small_val.groupby(["LABOR_AGREEMENT", "SITE", "SHIFT_DATE"]).size().reset_index()
+splitting_val = small_val.groupby(["JOB_FAMILY_DESCRIPTION", "SITE", "SHIFT_DATE"]).size().reset_index()
 splitting_val = splitting_val.rename({"SHIFT_DATE":"ds", 0:"y"}, axis=1)
 
 # create timeframe data for prediction
-timeframe = pd.DataFrame(pd.date_range(start='2017-01-02', end='2017-12-31', freq="D")).rename({0:"ds"}, axis=1)
+timeframe = pd.DataFrame(pd.date_range(start='2017-01-01', end='2017-12-31', freq="D")).rename({0:"ds"}, axis=1)
 
 # method for running prophet models
 def run_prophet(series, timeframe=timeframe):
@@ -55,23 +53,23 @@ def run_prophet(series, timeframe=timeframe):
     Returns the forecast of the predictions 
 
     """
-    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=True, interval_width=0.95)
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, interval_width=0.95)
     model.fit(series)
     forecast = model.predict(timeframe)
     return forecast
 
-# removing "EXCL" due to technical difficulties
+# create "SITE" and "JOB_FAMILY" groups
 small_sites = small_train["SITE"].unique()
-small_las = ["NURS", "FAC", "COM", "PARMED"]
+small_jfs = ["Registered Nurse-DC1", "Registered Nurse-DC2A Sup", "Registered Nurse-DC2B"]
 
 # create and store predictions and true results
 split_data = {}
 pred_results = {}
 true_results = {}
 for i in small_sites:
-    for j in small_las:
-        temp_data_train = splitting_train[(splitting_train["SITE"]==i) & (splitting_train["LABOR_AGREEMENT"]==j)].reset_index()
-        temp_data_val = splitting_val[(splitting_val["SITE"]==i) & (splitting_val["LABOR_AGREEMENT"]==j)].reset_index(drop=True)
+    for j in small_jfs:
+        temp_data_train = splitting_train[(splitting_train["SITE"]==i) & (splitting_train["JOB_FAMILY_DESCRIPTION"]==j)].reset_index()
+        temp_data_val = splitting_val[(splitting_val["SITE"]==i) & (splitting_val["JOB_FAMILY_DESCRIPTION"]==j)].reset_index(drop=True)
         split_data[(i, j)] = temp_data_train
         true_results[(i, j)] = temp_data_val
         try:
@@ -88,7 +86,7 @@ for i in true_results:
         combined[i] = pd.merge(true_results[i], pred_results[i], on="ds", how="outer")[["ds", "y", "yhat", 
                                                                                         "yhat_lower", "yhat_upper"]]
 
-# convert to week and calculating MAPE weekly
+# convert to week and calculating errors weekly
 weekly = {}
 for i in combined:
     # create week column
@@ -112,7 +110,9 @@ for i in combined:
     weekly[i]["week"] = weekly[i]["ds"].dt.weekofyear
     weekly[i]["site"] = np.repeat(i[0], length)
     weekly[i]["labor_agreement"] = np.repeat(i[1], length)
-
+    
 # export to "data/predictions/" directory
-for i, j in weekly:
-    weekly[(i,j)].to_csv("../data/predictions/{}_{}.csv".format(i,j))
+total_data = pd.DataFrame()
+for i in weekly:
+    total_data = pd.concat([total_data, weekly[i]], axis=0)
+total_data.to_csv("../data/predictions/predictions.csv")
