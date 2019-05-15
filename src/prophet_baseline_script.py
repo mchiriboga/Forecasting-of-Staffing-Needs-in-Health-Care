@@ -105,11 +105,11 @@ for i in combined:
                            weekly_yhat_upper["yhat_upper"]], 
                           axis=1)
 
-    # create columns "year", "site", "labor_agreement"
+    # create columns "year", "site", "job_family_description"
     length = weekly[i].shape[0]
     weekly[i]["week"] = weekly[i]["ds"].dt.weekofyear
     weekly[i]["site"] = np.repeat(i[0], length)
-    weekly[i]["labor_agreement"] = np.repeat(i[1], length)
+    weekly[i]["job_family_description"] = np.repeat(i[1], length)
     
 # export to "data/predictions/" directory
 total_data = pd.DataFrame()
