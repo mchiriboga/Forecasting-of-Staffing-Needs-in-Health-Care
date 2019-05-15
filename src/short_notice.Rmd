@@ -1,5 +1,5 @@
 ---
-title: "Overtime Pattern"
+title: "Short Notice Pattern"
 output: html_document
 ---
 
@@ -14,14 +14,12 @@ suppressPackageStartupMessages(library(MLmetrics))
 
 ## Introduction
 
-In this draft we explore the overtime pattern for the nurses. We consider the data related to the following two values:
+In this draft we explore the short notice pattern for the nurses. There are two kind of short notice:
 
-- `Overtime` in `EARNING_CATEGORY` column, indicating the excepted is backfilled by overtime, and
-- `NURS` in `LABOR_AGREEMENT` column, indicating the position is nurse.
+- Less than one week, and
+- Less than 48 hours.
 
-Since overtime backfill is expensive, we want to know the percentage of exception backfilled by "overtime" over the total number of exceptions, in order to take actions before hand. We use Facebook's Prophet model for predicting, and LOESS moving average for generating the intervals.
-
-As a result, for each week of the dates to be predicted, we give a predicted percentage and an interval with more than 90% confidence.
+We will explore the percentage/amount of the short notice exceptions by week.
 
 ## Load Data
 
@@ -31,168 +29,30 @@ For tuning the model, we use the training data, including the exceptions from en
 df <- read_csv("../data/train.csv")
 ```
 
-```{r}
-df %>% 
-  filter(LABOR_AGREEMENT == 'NURS') %>% 
-  group_by(JOB_FAMILY, JOB_FAMILY_DESCRIPTION) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count))
+```{r Prepare Data}
+short_notice <- df %>% 
+  filter(SHIFT_DATE < as.Date("2017-12-31")) %>% 
+  mutate(notice = seconds_to_period(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)) %>% 
+  mutate(notice_week = notice < period(7, "days"),
+         notice_48hr = notice < period(2, "days")) %>% 
+  select(SHIFT_DATE, JOB_FAMILY, notice_week, notice_48hr)
 ```
 
+```{r}
+sum(short_notice$notice_week)/nrow(short_notice)
+```
 
-## Overall Weekly Pattern
-
-Below is some EDA for the weekly pattern of overtime percentage. We can see there is some pattern in the graphs:
-
-- Trend decrease from January, reach the bottom at around week 34.
-- From Week 34, increase till the end of the year.
+## Short Notice One Week Before: Overall Weekly Pattern
 
 ```{r Overall: Weekly Analysis}
 # for each week, get the percentage of "Overtime" over all exceptions
 # ds: first day of that week
-overall <- df %>% 
-  mutate(ds = floor_date(SHIFT_DATE, unit = "week"), # first day of the week
-         overtime = EARNING_CATEGORY == "Overtime") %>% 
+short_notice %>% 
+  mutate(ds = floor_date(SHIFT_DATE, unit = "week")) %>% 
   group_by(ds) %>% 
-  summarise(over = sum(overtime), total = n()) %>% 
-  mutate(y = over/total) %>% 
-  select(ds, y)
-
-## visualization
-overall %>% 
+  summarise(y = sum(notice_week)/n()) %>% 
   ggplot() +
-  geom_line(aes(x = week(ds), y = y, color = factor(year(ds))))
-```
-
-## Labor Agreement: Nurse
-
-First we prepare data for the group of nurse: 
-
-```{r Nurse: data}
-nurse <- df %>% 
-  filter(LABOR_AGREEMENT == "NURS")
-
-# check the amount of data we have
-nrow(nurse)
-```
-
-```{r Nurse: EDA}
-# get the percentage of "Overtime" over all exceptions
-nurse_daily <- nurse %>% 
-  mutate(overtime = EARNING_CATEGORY == "Overtime") %>% 
-  group_by(SHIFT_DATE) %>% 
-  summarise(over = sum(overtime), total = n()) %>% 
-  mutate(y = over/total) %>% 
-  select(ds = SHIFT_DATE, y)
-
-# get the average percentage of a week
-# ds: first day of that week
-nurse_weekly <- nurse_daily %>% 
-  mutate(ds = floor_date(ds, unit = "week")) %>% 
-  group_by(ds) %>% 
-  summarise(y = mean(y))
-
-## visualization
-ggplot() +
-  geom_line(data = nurse_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
-```
-
-Then we make the prediction by Prophet.
-
-```{r Nurse: Predict by Prophet}
-# split train and validate
-train <- nurse_daily %>% 
-  filter(year(ds) < 2017)
-
-# get the end date of training set
-end_date <- max(train$ds)
-
-# generate model
-m <- prophet(train, 
-             yearly.seasonality = TRUE,
-             interval.width = 0.62)
-  
-# predict
-future <- make_future_dataframe(m, periods = 365)
-prediction <- predict(m, future)
-```
-
-```{r Nurse: Prediction Results}
-# aggregate the predicted result by week
-pred_all <- prediction %>% 
-  mutate(ds = floor_date(ds, unit = "week")) %>% 
-  group_by(ds) %>% 
-  summarise(yhat = mean(yhat))
-
-# aggregate the validation data by week
-val_all <- nurse_weekly %>% 
-  mutate(val_split = year(ds) >= 2017)
-
-# make a visualize of the predicted data we have
-ggplot() +
-  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Actual Data")) +
-  geom_line(data = pred_all, aes(x = as.Date(ds), y = yhat, color = "Prediction"))
-```
-
-```{r}
-# make a visualization for the prediction period: 2017
-pred_17 <- pred_all %>% 
-  filter(year(ds) > 2016)
-
-val_17 <- val_all %>% 
-  filter(year(ds) > 2016) %>% 
-  select(ds, y)
-
-ggplot() +
-  geom_line(data = val_17, aes(x = as.Date(ds), y = y, color = "Val")) +
-  geom_line(data = pred_17, aes(x = as.Date(ds), y = yhat, color = "Pred"))
-```
-
-We can see we have a pretty good prediction on the validation set.
-
-Besides, other that just a number, we also want to provide an interval for the prediction. We use LOESS moving average to smooth the prediction we have, and make adjustments to generate an interval.
-
-```{r Nurse: Intervals}
-# Idea: Use Loess to get a smoothed interval
-pp <- pred_all %>% 
-  mutate(id = week(ds))
-
-ll <- loess(yhat ~ week(ds), data = pp, span = 0.3)
-out <- predict(ll)
-
-interval <- pred_all %>% 
-  mutate(upper = out + 0.03,
-         lower = out - 0.014)
-
-# visualize the intervals
-ggplot() +
-  geom_line(data = val_all, aes(x = as.Date(ds), y = y, color = "Val")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = yhat, color = "yhat")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = upper, color = "loess")) +
-  geom_line(data = interval, aes(x = as.Date(ds), y = lower, color = "loess"))
-```
-
-```{r Nurse: Accuracy}
-result <- interval %>% 
-  mutate(y = val_all$y) %>% 
-  filter(year(ds) > 2016) 
-
-result %>% 
-  mutate(test = y < upper & y > lower) %>% 
-  group_by() %>% 
-  summarise(sum = sum(test)) %>% 
-  mutate(accuracy = sum/nrow(result))
-```
-
-The accuracy that the prediction falls in the interval on the validation set is around `96%`. However, the validation set is small, so the accuracy might not indicate that the accuracy will always be that high.
-
-**Sample Output**
-
-For the give dates, we have an prediction and an interval for each week.
-
-```{r Nurse: Sample Output}
-result %>% 
-  select(-y)
+  geom_line(aes(x = ds, y = y, color = factor(year(ds))))
 ```
 
 ## Job Family: DC1000 (Registered Nurse-DC1)
@@ -200,7 +60,7 @@ result %>%
 First we prepare data for the group of DC1000, which is "Registered Nurse-DC1": 
 
 ```{r DC1: data}
-dc1 <- df %>% 
+dc1 <- short_notice %>% 
   filter(JOB_FAMILY == "DC1000")
 
 # check the amount of data we have
@@ -210,10 +70,8 @@ nrow(dc1)
 ```{r DC1: EDA}
 # get the percentage of "Overtime" over all exceptions
 dc1_daily <- dc1 %>% 
-  mutate(overtime = EARNING_CATEGORY == "Overtime") %>% 
   group_by(SHIFT_DATE) %>% 
-  summarise(over = sum(overtime), total = n()) %>% 
-  mutate(y = over/total) %>% 
+  summarise(y = sum(notice_week)/n()) %>% 
   select(ds = SHIFT_DATE, y)
 
 # get the average percentage of a week
@@ -231,7 +89,7 @@ ggplot() +
 ```{r DC1: Predict by Prophet}
 # split train and validate
 train <- dc1_weekly %>% 
-  filter(year(ds) %in% c(2013, 2015, 2016))
+  filter(year(ds) %in% c(2013, 2014, 2015, 2016))
 
 # get the end date of training set
 end_date <- max(train$ds)
@@ -281,12 +139,12 @@ ggplot() +
 pp <- pred_all %>% 
   mutate(id = week(ds))
 
-ll <- loess(yhat ~ week(ds), data = pp, span = 0.3)
+ll <- loess(yhat ~ week(ds), data = pp, span = 0.2)
 out <- predict(ll)
 
 interval <- pred_all %>% 
-  mutate(upper = out + 0.026,
-         lower = out - 0.022)
+  mutate(upper = out + 0.04,
+         lower = out - 0.05)
 
 # visualize the intervals
 ggplot() +
@@ -330,12 +188,34 @@ result %>%
 First we prepare data for the group of DC2A00: 
 
 ```{r DC2A: data}
-dc2a <- df %>% 
+dc2a <- short_notice %>% 
   filter(JOB_FAMILY == "DC2A00")
 
 # check the amount of data we have
 nrow(dc2a)
 ```
+
+
+```{r DC2A: EDA}
+# get the percentage of "Overtime" over all exceptions
+dc2a_daily <- dc2a %>% 
+  group_by(SHIFT_DATE) %>% 
+  summarise(y = sum(notice_week)/n()) %>% 
+  select(ds = SHIFT_DATE, y)
+
+# get the average percentage of a week
+# ds: first day of that week
+dc2a_weekly <- dc2a_daily %>% 
+  mutate(ds = floor_date(ds, unit = "week")) %>% 
+  group_by(ds) %>% 
+  summarise(y = mean(y))
+
+## visualization
+ggplot() +
+  geom_line(data = dc2a_weekly, aes(x = week(ds), y = y, color = factor(year(ds))))
+```
+
+- No Appearant Pattern, but small in some middle weeks.
 
 ```{r DC2A: EDA}
 # get the percentage of "Overtime" over all exceptions
