@@ -1,0 +1,70 @@
+---
+title: "Untitled"
+author: "Weifeng Davy Guo"
+date: '2019-05-08'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(forecast))
+suppressPackageStartupMessages(library(datetime))
+```
+
+```{r}
+data <- read_csv("exception_hours.csv")
+```
+```{r}
+head(data)
+```
+
+
+```{r}
+# generate historical records of nurse only for St Paul's Hospital, set the "week" as the first day of that week
+(df <- data %>%
+   filter(year(SHIFT_DATE) < 2019,LABOR_AGREEMENT == "NURS") %>%  
+   filter(!grepl('Cancelled by Unit|Cancelled by Scheduler', EXCEPTION_REASON)) %>%
+   filter(!grepl('Education|Swap', EXCEPTION_GROUP)) %>%
+   filter(SITE %in% c("Brock Fahrni", "Holy Family","Mt St Joseph",
+                     "St Paul's Hospital", "SVH Langara","Youville Residence")) %>% 
+   mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)/3600),
+          WEEKDAY = weekdays(SHIFT_DATE),
+          MONTH = month(SHIFT_DATE)) %>% 
+   select("EXCEPTION_HOURS","SHIFT_DATE","WEEKDAY","NOTICE","EARNING_CATEGORY",
+          "JOB_FAMILY","SITE","MONTH") %>% 
+   filter(NOTICE > 0) %>% 
+   mutate(WEEKDAY = as.numeric(as.character(fct_recode(WEEKDAY,
+                            "1" = "Monday", 
+                            "2" = "Tuesday", 
+                            "3" = "Wednesday",
+                            "4" = "Thursday", 
+                            "5" = "Friday", 
+                            "6" = "Saturday",
+                            "7" = "Sunday")))) %>% 
+   mutate(SITE = as.numeric(as.character(fct_recode(SITE,
+                            "1" = "St Paul's Hospital", 
+                            "2" = "Mt St Joseph", 
+                            "3" = "Holy Family",
+                            "4" = "SVH Langara", 
+                            "5" = "Brock Fahrni", 
+                            "6" = "Youville Residence")))) %>% 
+   mutate(JOB_FAMILY = as.numeric(as.character(fct_recode(JOB_FAMILY,
+                            "1" = "DC1000","2" = "DC2B00", "3" = "LPN001","4" = "DC2A00", "5" = "EXCLST", 
+                            "6" = "PS2000","7" = "DC3000", "8" = "CH1000", "9" = "CH3000","10" = "EXCLLD", 
+                            "11" = "EMPLSN","12" = "CRAIDE","13" = "PS1000","14" = "OTHER1","15" = "RESCAR",
+                            "16" = "MEDTEC","17" = "NUA001","18" = "STDNT1","19" = "STLSUP","20" = "SOCMSW", 
+                            "21" = "CARDIO","22" = "COMHWK","23" = "CLOTHR","24" = "DIAGOT","25" = "PORTER"))))
+ )
+```
+
+```{r}
+write.csv(df, file = "classification.csv")
+```
+
+
+
+
+
+
