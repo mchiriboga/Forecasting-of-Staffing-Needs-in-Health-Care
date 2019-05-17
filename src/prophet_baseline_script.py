@@ -2,6 +2,7 @@
 # load packages
 import pandas as pd
 import numpy as np
+import os
 from fbprophet import Prophet
 
 # read data
@@ -95,9 +96,15 @@ for i in combined:
 
     # store y, yhat, yhat_lower, yhat_upper
     weekly_y = combined[i].groupby("ds").y.sum().reset_index()
-    weekly_yhat = combined[i].groupby("ds").yhat.sum().reset_index()
-    weekly_yhat_lower = combined[i].groupby("ds").yhat_lower.sum().reset_index()
-    weekly_yhat_upper = combined[i].groupby("ds").yhat_upper.sum().reset_index()
+    weekly_yhat = combined[i].groupby("ds").yhat.sum().round(0).astype(int).reset_index()
+    weekly_yhat_lower = combined[i].groupby("ds").yhat_lower.sum().round(0).astype(int).reset_index()
+    weekly_yhat_upper = combined[i].groupby("ds").yhat_upper.sum().round(0).astype(int).reset_index()
+
+    # replace negative prediction values with 0
+    weekly_yhat = weekly_yhat.where(weekly_yhat["yhat"] >= 0, 0)
+    weekly_yhat_lower = weekly_yhat_lower.where(weekly_yhat_lower["yhat_lower"] >= 0, 0)
+    weekly_yhat_upper = weekly_yhat_upper.where(weekly_yhat_upper["yhat_upper"] >= 0, 0)
+
 
     # merge weekly results
     weekly[i] = pd.concat([weekly_y, weekly_yhat["yhat"],
@@ -111,8 +118,14 @@ for i in combined:
     weekly[i]["site"] = np.repeat(i[0], length)
     weekly[i]["job_family"] = np.repeat(i[1], length)
 
+# create data/predictions folder if it doesn't exist
+predictions_path = "../data/predictions/"
+if not os.path.exists(predictions_path):
+    os.mkdir(predictions_path)
+
+
 # export to "data/predictions/" directory
 total_data = pd.DataFrame()
 for i in weekly:
     total_data = pd.concat([total_data, weekly[i]], axis=0)
-total_data.to_csv("../data/predictions/predictions.csv")
+total_data.to_csv(predictions_path + "predictions.csv")
