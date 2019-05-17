@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 # load packages
 import pandas as pd
 import numpy as np
@@ -105,22 +105,24 @@ for i in combined:
     weekly_yhat_lower = weekly_yhat_lower.where(weekly_yhat_lower["yhat_lower"] >= 0, 0)
     weekly_yhat_upper = weekly_yhat_upper.where(weekly_yhat_upper["yhat_upper"] >= 0, 0)
 
+
     # merge weekly results
     weekly[i] = pd.concat([weekly_y, weekly_yhat["yhat"],
                            weekly_yhat_lower["yhat_lower"],
                            weekly_yhat_upper["yhat_upper"]],
                           axis=1)
 
-    # create columns "year", "site", "labor_agreement"
+    # create columns "year", "site", "JOB_FAMILY"
     length = weekly[i].shape[0]
     weekly[i]["week"] = weekly[i]["ds"].dt.weekofyear
     weekly[i]["site"] = np.repeat(i[0], length)
-    weekly[i]["labor_agreement"] = np.repeat(i[1], length)
+    weekly[i]["job_family"] = np.repeat(i[1], length)
 
 # create data/predictions folder if it doesn't exist
 predictions_path = "../data/predictions/"
 if not os.path.exists(predictions_path):
     os.mkdir(predictions_path)
+
 
 # export to "data/predictions/" directory
 total_data = pd.DataFrame()
