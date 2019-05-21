@@ -27,22 +27,26 @@ head(data)
    filter(year(SHIFT_DATE) < 2019,LABOR_AGREEMENT == "NURS") %>%  
    filter(!grepl('Cancelled by Unit|Cancelled by Scheduler', EXCEPTION_REASON)) %>%
    filter(!grepl('Education|Swap', EXCEPTION_GROUP)) %>%
+   filter(!grepl('Relief Not Needed', EARNING_CATEGORY)) %>%
    filter(SITE %in% c("Brock Fahrni", "Holy Family","Mt St Joseph",
-                     "St Paul's Hospital", "SVH Langara","Youville Residence")) %>% 
+                     "St Paul's Hospital", "SVH Langara","Youville Residence")) %>%
+   filter(JOB_FAMILY %in% c("DC1000", "DC2B00","DC2A00")) %>% 
    mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)/3600),
           WEEKDAY = weekdays(SHIFT_DATE),
-          MONTH = month(SHIFT_DATE)) %>% 
+          MONTH = month(SHIFT_DATE),
+          WEEK = cut(as.Date(SHIFT_DATE), "week")) %>%
+   arrange(WEEK) %>% 
    select("EXCEPTION_HOURS","SHIFT_DATE","WEEKDAY","NOTICE","EARNING_CATEGORY",
-          "JOB_FAMILY","SITE","MONTH") %>% 
-   filter(NOTICE > 0) %>% 
+          "JOB_FAMILY","SITE","MONTH","WEEK") %>% 
+   filter(NOTICE >0) %>% 
    mutate(WEEKDAY = as.numeric(as.character(fct_recode(WEEKDAY,
                             "1" = "Monday", 
-                            "2" = "Tuesday", 
-                            "3" = "Wednesday",
-                            "4" = "Thursday", 
-                            "5" = "Friday", 
-                            "6" = "Saturday",
-                            "7" = "Sunday")))) %>% 
+                            "1" = "Tuesday", 
+                            "1" = "Wednesday",
+                            "1" = "Thursday", 
+                            "1" = "Friday", 
+                            "0" = "Saturday",
+                            "0" = "Sunday")))) %>% 
    mutate(SITE = as.numeric(as.character(fct_recode(SITE,
                             "1" = "St Paul's Hospital", 
                             "2" = "Mt St Joseph", 
@@ -51,17 +55,59 @@ head(data)
                             "5" = "Brock Fahrni", 
                             "6" = "Youville Residence")))) %>% 
    mutate(JOB_FAMILY = as.numeric(as.character(fct_recode(JOB_FAMILY,
-                            "1" = "DC1000","2" = "DC2B00", "3" = "LPN001","4" = "DC2A00", "5" = "EXCLST", 
-                            "6" = "PS2000","7" = "DC3000", "8" = "CH1000", "9" = "CH3000","10" = "EXCLLD", 
-                            "11" = "EMPLSN","12" = "CRAIDE","13" = "PS1000","14" = "OTHER1","15" = "RESCAR",
-                            "16" = "MEDTEC","17" = "NUA001","18" = "STDNT1","19" = "STLSUP","20" = "SOCMSW", 
-                            "21" = "CARDIO","22" = "COMHWK","23" = "CLOTHR","24" = "DIAGOT","25" = "PORTER"))))
+                            "1" = "DC1000",
+                            "2" = "DC2B00", 
+                            "3" = "DC2A00")))) %>% 
+   mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+                            "Straight Time" = "Regular Relief Utilized",
+                            "Straight Time" = "Casual at Straight-Time", 
+                            "Straight Time" = "PT Over FTE",
+                            "Straight Time" = "Miscellaneous Straight-Time",
+                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+                            "Straight Time" = "FT Employee Moved - Straight-Time",
+                            "Others" = "Agency",
+                            "Others" = "Insufficient Notice", 
+                            "Others" = "On-Call"))
  )
 ```
+		
+	
+```{r}
+ (df1 <- df %>% 
+    group_by(EARNING_CATEGORY) %>% 
+    summarise(TOTAL =n())%>%
+    arrange(TOTAL))
+```
+```{r}
+sum(df1["TOTAL"])
+```
+
+
+
+```{r}
+#generate weekly expection number for St Paul's Hospital based on different reason
+# (df2 <- df %>% 
+#    group_by(SHIFT_DATE, EARNING_CATEGORY) %>%
+#    summarise(total =n()) %>%
+#    spread(EARNING_CATEGORY,total))
+# df2[is.na(df2)] <- 0
+# df2
+```
+
+```{r}
+# (df3 <- merge(df, df2, by = "SHIFT_DATE", sort = TRUE))
+# df3[is.na(df3)] <- 0
+```
+
 
 ```{r}
 write.csv(df, file = "classification.csv")
 ```
+
+```{r}
+unique(df["EARNING_CATEGORY"])
+```
+
 
 
 
