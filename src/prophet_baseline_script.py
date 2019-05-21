@@ -36,45 +36,56 @@ splitting_val = small_val.groupby(["JOB_FAMILY_DESCRIPTION", "SITE", "SHIFT_DATE
 splitting_val = splitting_val.rename({"SHIFT_DATE":"ds", 0:"y"}, axis=1)
 
 # create timeframe data for prediction
+total_timeframe = pd.DataFrame(pd.date_range(start='2013-01-01', end='2016-12-31', freq="D")).rename({0:"ds"}, axis=1)
 timeframe = pd.DataFrame(pd.date_range(start='2017-01-01', end='2017-12-31', freq="D")).rename({0:"ds"}, axis=1)
 
 # method for running prophet models
 def run_prophet(series, timeframe=timeframe):
     """
-    Runs the Prophet
-
+    Runs the Prophet 
+    
     Key arguments:
     --------------
     series -- (DataFrame) time series data
-    timeframe -- (DataFrame) a DataFrame with one column
+    timeframe -- (DataFrame) a DataFrame with one column 
                  consisting of predicted dates
 
-    Returns:
+    Returns: 
     --------------
-    Returns the forecast of the predictions
+    Returns the forecast of the predictions 
 
     """
-    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, interval_width=0.95)
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, 
+                    # changepoint_prior_scale=0.001,
+                    # mcmc_samples=300,
+                    interval_width=0.95)
     model.fit(series)
     forecast = model.predict(timeframe)
-    return forecast
+    return forecast, model
 
 # create "SITE" and "JOB_FAMILY" groups
 small_sites = small_train["SITE"].unique()
 small_jfs = ["Registered Nurse-DC1", "Registered Nurse-DC2A Sup", "Registered Nurse-DC2B"]
 
 # create and store predictions and true results
+models = {}
 split_data = {}
 pred_results = {}
 true_results = {}
 for i in small_sites:
     for j in small_jfs:
         temp_data_train = splitting_train[(splitting_train["SITE"]==i) & (splitting_train["JOB_FAMILY_DESCRIPTION"]==j)].reset_index()
+        temp_data_train = pd.merge(total_timeframe, temp_data_train, on="ds", how="outer")
+        temp_data_train["y"] = temp_data_train["y"].fillna(0)
+        
         temp_data_val = splitting_val[(splitting_val["SITE"]==i) & (splitting_val["JOB_FAMILY_DESCRIPTION"]==j)].reset_index(drop=True)
+        temp_data_val = pd.merge(timeframe, temp_data_val, on="ds", how="outer")
+        temp_data_val["y"] = temp_data_val["y"].fillna(0)
+        
         split_data[(i, j)] = temp_data_train
         true_results[(i, j)] = temp_data_val
         try:
-            pred_results[(i, j)] = run_prophet(temp_data_train)
+            pred_results[(i, j)], models[(i,j)] = run_prophet(temp_data_train)
             print("Fitting -", i, j, ": Done")
         except ValueError:
             pred_results[(i, j)] = None
