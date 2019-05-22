@@ -27,41 +27,98 @@ head(data)
    filter(year(SHIFT_DATE) < 2019,LABOR_AGREEMENT == "NURS") %>%  
    filter(!grepl('Cancelled by Unit|Cancelled by Scheduler', EXCEPTION_REASON)) %>%
    filter(!grepl('Education|Swap', EXCEPTION_GROUP)) %>%
+   filter(!grepl('Relief Not Needed', EARNING_CATEGORY)) %>%
    filter(SITE %in% c("Brock Fahrni", "Holy Family","Mt St Joseph",
-                     "St Paul's Hospital", "SVH Langara","Youville Residence")) %>% 
-   mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)/3600),
+                     "St Paul's Hospital", "SVH Langara","Youville Residence")) %>%
+   mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)),
+          AWARE = ceiling(as.numeric(MIN_CALL_DATE_TIME - EXCEPTION_CREATION_DATE)),
           WEEKDAY = weekdays(SHIFT_DATE),
-          MONTH = month(SHIFT_DATE)) %>% 
-   select("EXCEPTION_HOURS","SHIFT_DATE","WEEKDAY","NOTICE","EARNING_CATEGORY",
-          "JOB_FAMILY","SITE","MONTH") %>% 
-   filter(NOTICE > 0) %>% 
+          MONTH = month(SHIFT_DATE)) %>%
+   select("EXCEPTION_GROUP","WEEKDAY","SITE","MONTH","PROGRAM","SUB_PROGRAM","JOB_FAMILY",
+          "EXCEPTION_HOURS","SHIFT_DATE",
+          "NOTICE","AWARE","EARNING_CATEGORY") %>% 
+   filter(NOTICE >0) %>% 
    mutate(WEEKDAY = as.numeric(as.character(fct_recode(WEEKDAY,
                             "1" = "Monday", 
-                            "2" = "Tuesday", 
-                            "3" = "Wednesday",
-                            "4" = "Thursday", 
-                            "5" = "Friday", 
-                            "6" = "Saturday",
-                            "7" = "Sunday")))) %>% 
-   mutate(SITE = as.numeric(as.character(fct_recode(SITE,
-                            "1" = "St Paul's Hospital", 
-                            "2" = "Mt St Joseph", 
-                            "3" = "Holy Family",
-                            "4" = "SVH Langara", 
-                            "5" = "Brock Fahrni", 
-                            "6" = "Youville Residence")))) %>% 
-   mutate(JOB_FAMILY = as.numeric(as.character(fct_recode(JOB_FAMILY,
-                            "1" = "DC1000","2" = "DC2B00", "3" = "LPN001","4" = "DC2A00", "5" = "EXCLST", 
-                            "6" = "PS2000","7" = "DC3000", "8" = "CH1000", "9" = "CH3000","10" = "EXCLLD", 
-                            "11" = "EMPLSN","12" = "CRAIDE","13" = "PS1000","14" = "OTHER1","15" = "RESCAR",
-                            "16" = "MEDTEC","17" = "NUA001","18" = "STDNT1","19" = "STLSUP","20" = "SOCMSW", 
-                            "21" = "CARDIO","22" = "COMHWK","23" = "CLOTHR","24" = "DIAGOT","25" = "PORTER"))))
+                            "1" = "Tuesday", 
+                            "1" = "Wednesday",
+                            "1" = "Thursday", 
+                            "1" = "Friday", 
+                            "0" = "Saturday",
+                            "0" = "Sunday")))) %>%
+   mutate(SITE = as.numeric(factor(SITE))) %>%
+   mutate(PROGRAM = as.numeric(factor(PROGRAM))) %>%
+   mutate(SUB_PROGRAM = as.numeric(factor(SUB_PROGRAM))) %>%
+   mutate(EXCEPTION_GROUP = as.numeric(factor(EXCEPTION_GROUP))) %>%
+   mutate(JOB_FAMILY = as.numeric(factor(JOB_FAMILY))) 
  )
+df[is.na(df)] <- 0
+```
+```{r}
+df
+```
+
+
+```{r}
+# generate dataframe with 4 labels
+ (df1 <- df %>% 
+    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+                            "Straight Time" = "Regular Relief Utilized",
+                            "Straight Time" = "Casual at Straight-Time", 
+                            "Straight Time" = "PT Over FTE",
+                            "Straight Time" = "Miscellaneous Straight-Time",
+                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+                            "Straight Time" = "FT Employee Moved - Straight-Time",
+                            "Others" = "Agency",
+                            "Others" = "Insufficient Notice", 
+                            "Others" = "On-Call"))
+  )
+# generate dataframe with 2 labels
+ (df2 <- df %>% 
+    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+                            "Straight Time" = "Regular Relief Utilized",
+                            "Straight Time" = "Casual at Straight-Time", 
+                            "Straight Time" = "PT Over FTE",
+                            "Straight Time" = "Miscellaneous Straight-Time",
+                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+                            "Straight Time" = "FT Employee Moved - Straight-Time",
+                            "Overtime and Beyond" = "Overtime", 
+                            "Overtime and Beyond" = "Relief Not Found",
+                            "Overtime and Beyond" = "Agency",
+                            "Overtime and Beyond" = "Insufficient Notice", 
+                            "Overtime and Beyond" = "On-Call"))
+  )
 ```
 
 ```{r}
-write.csv(df, file = "classification.csv")
+# generate dataframe with 3 labels
+ # (df3 <- df %>% 
+ #    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+ #                            "Straight Time" = "Regular Relief Utilized",
+ #                            "Straight Time" = "Casual at Straight-Time", 
+ #                            "Straight Time" = "PT Over FTE",
+ #                            "Straight Time" = "Miscellaneous Straight-Time",
+ #                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+ #                            "Straight Time" = "FT Employee Moved - Straight-Time",
+ #                            "Overtime and Agency" = "Overtime", 
+ #                            "Overtime and Agency" = "Agency",
+ #                            "Overtime and Agency" = "Insufficient Notice", 
+ #                            "Overtime and Agency" = "On-Call"))
+ #  )
 ```
+
+
+
+```{r}
+write.csv(df1, file = "classification1.csv")
+write.csv(df2, file = "classification2.csv")
+```
+
+
+
+
+
+
 
 
 
