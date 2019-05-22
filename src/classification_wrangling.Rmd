@@ -30,14 +30,13 @@ head(data)
    filter(!grepl('Relief Not Needed', EARNING_CATEGORY)) %>%
    filter(SITE %in% c("Brock Fahrni", "Holy Family","Mt St Joseph",
                      "St Paul's Hospital", "SVH Langara","Youville Residence")) %>%
-   filter(JOB_FAMILY %in% c("DC1000", "DC2B00","DC2A00")) %>% 
-   mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)/3600),
+   mutate(NOTICE = ceiling(as.numeric(SHIFT_START_DATE_TIME - EXCEPTION_CREATION_DATE)),
+          AWARE = ceiling(as.numeric(MIN_CALL_DATE_TIME - EXCEPTION_CREATION_DATE)),
           WEEKDAY = weekdays(SHIFT_DATE),
-          MONTH = month(SHIFT_DATE),
-          WEEK = cut(as.Date(SHIFT_DATE), "week")) %>%
-   arrange(WEEK) %>% 
-   select("EXCEPTION_HOURS","SHIFT_DATE","WEEKDAY","NOTICE","EARNING_CATEGORY",
-          "JOB_FAMILY","SITE","MONTH","WEEK") %>% 
+          MONTH = month(SHIFT_DATE)) %>%
+   select("EXCEPTION_GROUP","WEEKDAY","SITE","MONTH","PROGRAM",
+          "EXCEPTION_HOURS","EXCEPTION_CREATION_DATE","MIN_CALL_DATE_TIME","SHIFT_DATE",
+          "NOTICE","AWARE","EARNING_CATEGORY") %>% 
    filter(NOTICE >0) %>% 
    mutate(WEEKDAY = as.numeric(as.character(fct_recode(WEEKDAY,
                             "1" = "Monday", 
@@ -46,7 +45,44 @@ head(data)
                             "1" = "Thursday", 
                             "1" = "Friday", 
                             "0" = "Saturday",
-                            "0" = "Sunday")))) %>% 
+                            "0" = "Sunday")))) %>%
+   mutate(EXCEPTION_GROUP = as.numeric(as.character(fct_recode(EXCEPTION_GROUP,
+                            "1" = "Work Related Injury", 
+                            "2" = "Other", 
+                            "3" = "Move",
+                            "4" = "Unpaid Sick",
+                            "5" = "Leave of Absence",
+                            "6" = "Vacancy", 
+                            "7" = "Workload",
+                            "8" = "Paid Sick", 
+                            "9" = "Vacation", 
+                            "10" = "Casual Sick or Cancelled",
+                            "11" = "Schedule Adjustment", 
+                            "12" = "On Call & Call Back", 
+                            "13" = "Relief Sick")))) %>% 
+   mutate(PROGRAM = as.numeric(as.character(fct_recode(PROGRAM,
+                            "1" = "URBAN HLTH, MH&SU", 
+                            "2" = "EMERG-ICU", 
+                            "3" = "HEART  LUNG",
+                            "4" = "SURGERY",
+                            "5" = "ACCESS SERVICES",
+                            "6" = "RENAL", 
+                            "7" = "SENIORS CARE",
+                            "8" = "MEDICINE", 
+                            "9" = "PALLIATIVE SVCS", 
+                            "10" = "MATERNITY SERVICES",
+                            "11" = "IMAGING", 
+                            "12" = "WORKPL WS", 
+                            "13" = "NURSING PRACTICE  EDU",
+                            "14" = "NURSING ADMIN", 
+                            "15" = "PATIENT SAFETY", 
+                            "16" = "HUMAN RESOURCES",
+                            "17" = "ADMIN DECISION SUPPRT",
+                            "18" = "VP ADMIN SENIORS",
+                            "19" = "PROF PRACTICE", 
+                            "20" = "RISK MANAGEMENT",
+                            "21" = "PEOPLE STRATEGIES",
+                            "22" = "VP ADMIN ACUTE")))) %>%
    mutate(SITE = as.numeric(as.character(fct_recode(SITE,
                             "1" = "St Paul's Hospital", 
                             "2" = "Mt St Joseph", 
@@ -54,11 +90,17 @@ head(data)
                             "4" = "SVH Langara", 
                             "5" = "Brock Fahrni", 
                             "6" = "Youville Residence")))) %>% 
-   mutate(JOB_FAMILY = as.numeric(as.character(fct_recode(JOB_FAMILY,
-                            "1" = "DC1000",
-                            "2" = "DC2B00", 
-                            "3" = "DC2A00")))) %>% 
-   mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+   filter(!is.na(AWARE))
+ )
+```
+
+
+
+
+```{r}
+# generate dataframe with 4 labels
+ (df1 <- df %>% 
+    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
                             "Straight Time" = "Regular Relief Utilized",
                             "Straight Time" = "Casual at Straight-Time", 
                             "Straight Time" = "PT Over FTE",
@@ -68,45 +110,52 @@ head(data)
                             "Others" = "Agency",
                             "Others" = "Insufficient Notice", 
                             "Others" = "On-Call"))
- )
+  )
+# generate dataframe with 2 labels
+ (df2 <- df %>% 
+    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+                            "Straight Time" = "Regular Relief Utilized",
+                            "Straight Time" = "Casual at Straight-Time", 
+                            "Straight Time" = "PT Over FTE",
+                            "Straight Time" = "Miscellaneous Straight-Time",
+                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+                            "Straight Time" = "FT Employee Moved - Straight-Time",
+                            "Overtime and Beyond" = "Overtime", 
+                            "Overtime and Beyond" = "Relief Not Found",
+                            "Overtime and Beyond" = "Agency",
+                            "Overtime and Beyond" = "Insufficient Notice", 
+                            "Overtime and Beyond" = "On-Call"))
+  )
 ```
-		
-	
 ```{r}
- (df1 <- df %>% 
-    group_by(EARNING_CATEGORY) %>% 
-    summarise(TOTAL =n())%>%
-    arrange(TOTAL))
+
 ```
 ```{r}
-sum(df1["TOTAL"])
+# generate dataframe with 3 labels
+ # (df3 <- df %>% 
+ #    mutate(EARNING_CATEGORY = fct_recode(EARNING_CATEGORY,
+ #                            "Straight Time" = "Regular Relief Utilized",
+ #                            "Straight Time" = "Casual at Straight-Time", 
+ #                            "Straight Time" = "PT Over FTE",
+ #                            "Straight Time" = "Miscellaneous Straight-Time",
+ #                            "Straight Time" = "PT Employee Moved - Straight-Time", 
+ #                            "Straight Time" = "FT Employee Moved - Straight-Time",
+ #                            "Overtime and Agency" = "Overtime", 
+ #                            "Overtime and Agency" = "Agency",
+ #                            "Overtime and Agency" = "Insufficient Notice", 
+ #                            "Overtime and Agency" = "On-Call"))
+ #  )
 ```
 
-
-
-```{r}
-#generate weekly expection number for St Paul's Hospital based on different reason
-# (df2 <- df %>% 
-#    group_by(SHIFT_DATE, EARNING_CATEGORY) %>%
-#    summarise(total =n()) %>%
-#    spread(EARNING_CATEGORY,total))
-# df2[is.na(df2)] <- 0
-# df2
-```
-
-```{r}
-# (df3 <- merge(df, df2, by = "SHIFT_DATE", sort = TRUE))
-# df3[is.na(df3)] <- 0
-```
 
 
 ```{r}
-write.csv(df, file = "classification.csv")
+#write.csv(df, file = "classification.csv")
+write.csv(df1, file = "classification1.csv")
+write.csv(df2, file = "classification2.csv")
 ```
 
-```{r}
-unique(df["EARNING_CATEGORY"])
-```
+
 
 
 
