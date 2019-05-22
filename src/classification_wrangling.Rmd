@@ -34,8 +34,8 @@ head(data)
           AWARE = ceiling(as.numeric(MIN_CALL_DATE_TIME - EXCEPTION_CREATION_DATE)),
           WEEKDAY = weekdays(SHIFT_DATE),
           MONTH = month(SHIFT_DATE)) %>%
-   select("EXCEPTION_GROUP","WEEKDAY","SITE","MONTH","PROGRAM",
-          "EXCEPTION_HOURS","EXCEPTION_CREATION_DATE","MIN_CALL_DATE_TIME","SHIFT_DATE",
+   select("EXCEPTION_GROUP","WEEKDAY","SITE","MONTH","PROGRAM","SUB_PROGRAM","JOB_FAMILY",
+          "EXCEPTION_HOURS","SHIFT_DATE",
           "NOTICE","AWARE","EARNING_CATEGORY") %>% 
    filter(NOTICE >0) %>% 
    mutate(WEEKDAY = as.numeric(as.character(fct_recode(WEEKDAY,
@@ -46,55 +46,17 @@ head(data)
                             "1" = "Friday", 
                             "0" = "Saturday",
                             "0" = "Sunday")))) %>%
-   mutate(EXCEPTION_GROUP = as.numeric(as.character(fct_recode(EXCEPTION_GROUP,
-                            "1" = "Work Related Injury", 
-                            "2" = "Other", 
-                            "3" = "Move",
-                            "4" = "Unpaid Sick",
-                            "5" = "Leave of Absence",
-                            "6" = "Vacancy", 
-                            "7" = "Workload",
-                            "8" = "Paid Sick", 
-                            "9" = "Vacation", 
-                            "10" = "Casual Sick or Cancelled",
-                            "11" = "Schedule Adjustment", 
-                            "12" = "On Call & Call Back", 
-                            "13" = "Relief Sick")))) %>% 
-   mutate(PROGRAM = as.numeric(as.character(fct_recode(PROGRAM,
-                            "1" = "URBAN HLTH, MH&SU", 
-                            "2" = "EMERG-ICU", 
-                            "3" = "HEART  LUNG",
-                            "4" = "SURGERY",
-                            "5" = "ACCESS SERVICES",
-                            "6" = "RENAL", 
-                            "7" = "SENIORS CARE",
-                            "8" = "MEDICINE", 
-                            "9" = "PALLIATIVE SVCS", 
-                            "10" = "MATERNITY SERVICES",
-                            "11" = "IMAGING", 
-                            "12" = "WORKPL WS", 
-                            "13" = "NURSING PRACTICE  EDU",
-                            "14" = "NURSING ADMIN", 
-                            "15" = "PATIENT SAFETY", 
-                            "16" = "HUMAN RESOURCES",
-                            "17" = "ADMIN DECISION SUPPRT",
-                            "18" = "VP ADMIN SENIORS",
-                            "19" = "PROF PRACTICE", 
-                            "20" = "RISK MANAGEMENT",
-                            "21" = "PEOPLE STRATEGIES",
-                            "22" = "VP ADMIN ACUTE")))) %>%
-   mutate(SITE = as.numeric(as.character(fct_recode(SITE,
-                            "1" = "St Paul's Hospital", 
-                            "2" = "Mt St Joseph", 
-                            "3" = "Holy Family",
-                            "4" = "SVH Langara", 
-                            "5" = "Brock Fahrni", 
-                            "6" = "Youville Residence")))) %>% 
-   filter(!is.na(AWARE))
+   mutate(SITE = as.numeric(factor(SITE))) %>%
+   mutate(PROGRAM = as.numeric(factor(PROGRAM))) %>%
+   mutate(SUB_PROGRAM = as.numeric(factor(SUB_PROGRAM))) %>%
+   mutate(EXCEPTION_GROUP = as.numeric(factor(EXCEPTION_GROUP))) %>%
+   mutate(JOB_FAMILY = as.numeric(factor(JOB_FAMILY))) 
  )
+df[is.na(df)] <- 0
 ```
-
-
+```{r}
+df
+```
 
 
 ```{r}
@@ -127,9 +89,7 @@ head(data)
                             "Overtime and Beyond" = "On-Call"))
   )
 ```
-```{r}
 
-```
 ```{r}
 # generate dataframe with 3 labels
  # (df3 <- df %>% 
@@ -150,10 +110,12 @@ head(data)
 
 
 ```{r}
-#write.csv(df, file = "classification.csv")
 write.csv(df1, file = "classification1.csv")
 write.csv(df2, file = "classification2.csv")
 ```
+
+
+
 
 
 
