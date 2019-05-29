@@ -2,7 +2,7 @@
 title: "Exploratory Data Analysis"
 author: "Marcelle Chiriboga"
 date: '2019-05-13'
-output: github_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -11,6 +11,7 @@ suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(forecast))
 suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(qcc))
 ```
 
 ## Load the Data
@@ -64,7 +65,7 @@ First, lets focus only on the `exception_hours.csv`, exploring how exceptions ar
 
 #### `SITE`
 
-```{r}
+```{r facilities rank}
 # Check the total number of exceptions by facilities
 (facilities <- exception_hours %>% 
   group_by(SITE) %>% 
@@ -82,6 +83,16 @@ First, lets focus only on the `exception_hours.csv`, exploring how exceptions ar
 - Considering the total number of exceptions from 2013 to 2017, `St Paul's Hospital`, `Mt St Joseph`, `Holy Family` are the top facilities, where `St Paul's Hospital` has ~5x more exceptions than the second facility, `Mt St Joseph`.
 
 **We're focusing on the 10 facilities which include `LABOR_AGREEMENT = NURS`. Do we need to include any others?**
+
+> As discussed with Sam, there is no need to include other facilities and we won't consider the following sites on our analysis: `PHC Corporate`, `SVH Honoria Conway`, `St John Hospice` and `Billable`. In other words, we'll focus on: `St Paul's Hospital`, `Mt St Joseph`, `Holy Family`, `SVH Langara`, `Brock Fahrni`, `Youville Residence`.
+
+
+```{r facilities to be considered}
+facilities <- c("St Paul's Hospital", "Mt St Joseph", "Holy Family", "SVH Langara", "Brock Fahrni", "Youville Residence")
+
+# Subset the `exception_hours` dataset in order to just consider the facilities mentioned 
+exception_hours <- exception_hours %>% filter(SITE %in% facilities)
+```
 
 #### `LABOR_AGREEMENT`
 
@@ -116,42 +127,63 @@ exception_hours %>%
 
 **Observations:**
 
-- Considering the total number of exceptions from 2013 to 2017, `FAC`, `NURS` and `PARMED` are the top 3 `LABOR_AGREEMENT`.
+- Considering the total number of exceptions from 2013 to 2017, `NURS`, `FAC` and `PARMED` are the top 3 `LABOR_AGREEMENT`.
 - Most of the exceptions are from `St. Paul's Hospital`, where the majority are related to `NURS`. 
 
 **Should we focus only on the top three `LABOR_AGREEMENT`? Or is there value to analyzing all of the groups, even the less representative ones?**
+
+> As discussed with Sam, our analysis will focus on `NURS`, `FAC` and `PARMED` `LABOR_AGREEMENT`.
+
+```{r labor agreements to be considered}
+labor_agreements <- c("NURS", "FAC", "PARMED")
+
+# Subset the `exception_hours` dataset in order to just consider the top 3 LABOR_AGREEMENT
+exception_hours <- exception_hours %>% filter(LABOR_AGREEMENT %in% LABOR_AGREEMENT)
+```
 
 #### `JOB_FAMILY_DESCRIPTION`
 
 Exploring the `JOB_FAMILY_DESCRIPTION` of the main `LABOR_AGREEMENT`:
 
-- `FAC` job families (top 10) 
-
-```{r Expand FAC LABOR_AGREEMENT}
-# FAC job families
-fac_job_family <- exception_hours %>% 
-   filter(LABOR_AGREEMENT == "FAC") %>%
-   group_by(JOB_FAMILY_DESCRIPTION) %>% 
-  summarise(count = n()) %>% 
-  arrange(desc(count))
-
-# Print the top 10 FAC job families
-head(fac_job_family, 10)
-```
-
-
 - `NURS` job families (top 10)
 
 ```{r Expand NURS LABOR_AGREEMENT}
 # NURS job families
-nurs_job_family <- exception_hours %>% 
-   filter(LABOR_AGREEMENT == "NURS") %>%
+(nurs_job_family <- exception_hours %>% 
+  filter(LABOR_AGREEMENT == "NURS") %>%
+  group_by(JOB_FAMILY_DESCRIPTION) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  mutate(cumsum = cumsum(count),
+        freq = round(count / sum(count), 3),
+        cum_freq = cumsum(freq))
+)
+
+# Plot pareto
+nurs_job_family_count <- nurs_job_family$count
+names(nurs_job_family_count) <- nurs_job_family$`JOB_FAMILY_DESCRIPTION`
+pareto.chart(nurs_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pareto chart for NURS job families")
+```
+
+
+- `FAC` job families (top 10) 
+
+```{r Expand FAC LABOR_AGREEMENT}
+# FAC job families
+(fac_job_family <- exception_hours %>% 
+   filter(LABOR_AGREEMENT == "FAC") %>%
    group_by(JOB_FAMILY_DESCRIPTION) %>% 
   summarise(count = n()) %>% 
-  arrange(desc(count))
+  arrange(desc(count)) %>% 
+  mutate(cumsum = cumsum(count),
+        freq = round(count / sum(count), 3),
+        cum_freq = cumsum(freq))
+)
 
-# Print the top 10 NURS job families
-head(nurs_job_family, 10)
+# Plot pareto
+fac_job_family_count <- fac_job_family$count
+names(fac_job_family_count) <- fac_job_family$`JOB_FAMILY_DESCRIPTION`
+pareto.chart(fac_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pareto chart for FAC job families")
 ```
 
 
@@ -159,14 +191,21 @@ head(nurs_job_family, 10)
 
 ```{r Expand PARMED LABOR_AGREEMENT}
 # PARMED job families
-parmed_job_family <- exception_hours %>% 
+(parmed_job_family <- exception_hours %>% 
    filter(LABOR_AGREEMENT == "PARMED") %>%
    group_by(JOB_FAMILY_DESCRIPTION) %>% 
   summarise(count = n()) %>% 
-  arrange(desc(count))
+  arrange(desc(count)) %>% 
+  mutate(cumsum = cumsum(count),
+        freq = round(count / sum(count), 3),
+        cum_freq = cumsum(freq))
+)
 
-# Print the top 10 PARMED job families
-head(parmed_job_family, 10)
+
+# Plot pareto
+parmed_job_family_count <- parmed_job_family$count
+names(parmed_job_family_count) <- parmed_job_family$`JOB_FAMILY_DESCRIPTION`
+pareto.chart(parmed_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pareto chart for PARMED job families")
 ```
 
 #### `EXCEPTION_GROUP`
@@ -314,7 +353,7 @@ Analyze the exceptions occurred from 2013 to 2017, contrasting them with the pro
 - **Monthly Analysis**
 
 ```{r data set - monthly basis}
-# Create a data set considering a monthly basis
+# Create a dataset considering a monthly basis
 excep_prod_hours_monthly <- exception_and_productive_hours %>%
   # Consider the same window of the training set - data from 2013 to 2017
   filter(year(SHIFT_DATE) < 2018) %>% 
