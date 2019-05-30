@@ -7,6 +7,26 @@ from fbprophet import Prophet
 from stldecompose import decompose, forecast
 from stldecompose.forecast_funcs import (naive, drift, mean, seasonal_naive)
 
+def run_prophet(series, timeframe):
+    """
+    Runs the Prophet
+
+    Key arguments:
+    --------------
+    series -- (DataFrame) time series data
+    timeframe -- (DataFrame) a DataFrame with one column
+                 consisting of predicted dates
+
+    Returns:
+    --------------
+    Returns the forecast of the predictions
+
+    """
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, interval_width=0.95)
+    model.fit(series)
+    forecast = model.predict(timeframe)
+    return forecast, model
+
 # read data
 raw_data = pd.read_csv("../data/train.csv", parse_dates=["SHIFT_DATE"])
 
@@ -51,30 +71,6 @@ timeframe = pd.DataFrame(pd.date_range(start="2017-01-01", end="2017-12-31", fre
 small_sites = small_train["SITE"].unique()
 small_jfs = small_train["JOB_FAMILY"].unique()
 
-# method for running prophet models
-def run_prophet(series, timeframe=timeframe):
-    """
-    Runs the Prophet
-
-    Key arguments:
-    --------------
-    series -- (DataFrame) time series data
-    timeframe -- (DataFrame) a DataFrame with one column
-                 consisting of predicted dates
-
-    Returns:
-    --------------
-    Returns the forecast of the predictions
-
-    """
-    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False,
-                    # changepoint_prior_scale=0.001,
-                    # mcmc_samples=300,
-                    interval_width=0.95)
-    model.fit(series)
-    forecast = model.predict(timeframe)
-    return forecast, model
-
 # create and store predictions and true results
 models = {}
 split_data = {}
@@ -97,7 +93,6 @@ for i in small_sites:
         pred_results_future[(i, j)] = models[(i,j)].predict(timeframe)
         print("Fitting -", i, j, ": Done")
 
-# convert to week and calculating errors weekly
 weekly = {}
 for i in split_data.keys():
     # create week column
@@ -126,26 +121,29 @@ for i in split_data.keys():
     forecasted = models[i].predict(total_timeframe)
     actual = split_data[i]
 
+    # get residuals
     error = actual["y"] - forecasted["yhat"]
     obs = total_timeframe.copy()
     obs["error"] = error
     obs = obs.set_index("ds")
 
-    decomp = decompose(obs, period=365)
-    weekly_fcast = forecast(decomp, steps=365, fc_func=drift, seasonal=True)
+    # model residuals
+    period = int((np.max(timeframe) - np.min(timeframe)).dt.days)+1
+    decomp = decompose(obs, period=period)
+    weekly_fcast = forecast(decomp, steps=period, fc_func=drift, seasonal=True)
     weekly_fcast["week"] = weekly_fcast.index-pd.DateOffset(weekday=0, weeks=1)
     weekly_fcast = weekly_fcast.groupby("week").sum()
 
+    # replace weekly data
     resid_fcast = weekly_fcast.reset_index()["drift+seasonal"]
     weekly_yhat = (weekly[i]["yhat"] + resid_fcast).round(0)
     weekly_yhat_lower = (weekly[i]["yhat_lower"] + resid_fcast).round(0)
     weekly_yhat_upper = (weekly[i]["yhat_upper"] + resid_fcast).round(0)
 
+    # replace negatives with 0s
     weekly[i]["yhat"] = weekly_yhat.where(weekly_yhat >= 0, 0)
     weekly[i]["yhat_lower"] = weekly_yhat_lower.where(weekly_yhat_lower >= 0, 0)
     weekly[i]["yhat_upper"] = weekly_yhat_upper.where(weekly_yhat_upper >= 0, 0)
-
-
 
 # create data/predictions folder if it doesn't exist
 predictions_path = "../data/predictions/"

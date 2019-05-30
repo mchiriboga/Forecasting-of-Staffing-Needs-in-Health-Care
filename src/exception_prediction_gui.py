@@ -32,24 +32,32 @@ sg.SetOptions(element_padding=(10,3))
 
 layout = [
     [sg.Text('Choose a file to train the models', size=(35, 1))],
-    [sg.Text('Your File', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(os.path.join(os.getcwd(), "train.csv")), sg.FileBrowse()],
+    [sg.Text('Your File', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(os.path.join(os.path.abspath("../data/train.csv"))), sg.FileBrowse()],
     [sg.Text('_'  * 80)],
     [sg.Text('Please enter the timeframe you would like to predict:')],
-    [sg.Text('From (Start Date)', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(('YYYY-MM-DD'))],
-    [sg.Text('To (End Date)', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText('YYYY-MM-DD')],
+    [sg.Text('From (Start Date)', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(('YYYY-MM-DD'), key="startdate"), sg.CalendarButton('Choose Date', key='date1')],
+    [sg.Text('To (End Date)', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(('YYYY-MM-DD'), key="enddate"), sg.CalendarButton('Choose Date', key='date2')],
     [sg.Submit(), sg.Cancel()],
     ]
 
-window = sg.Window('Exception Prediction Tool', layout)
+# setup layout
+window = sg.Window('Exception Prediction Tool', grab_anywhere=False).Layout(layout)
 
 while True:
-    event, values = window.Read(timeout = 0)
+    event, values = window.Read(timeout = 200)
+    # setup calendar buttons
+    if values["date1"] is not None:
+        window.Element("startdate").Update(str(values["date1"])[:10])
+
+    if values["date2"] is not None:
+        window.Element("enddate").Update(str(values["date2"])[:10])
+
     if event is None or event == 'Cancel':
         break
     elif event == "Submit":
         try:
             # create prediction timeframe
-            timeframe = pd.DataFrame(pd.date_range(start=values[1], end=values[2], freq="D")).rename({0:"ds"}, axis=1)
+            timeframe = pd.DataFrame(pd.date_range(start=str(values["startdate"]), end=str(values["enddate"]), freq="D")).rename({0:"ds"}, axis=1)
         except ValueError as e:
             print("Please input correct dates.")
             continue
@@ -58,7 +66,7 @@ while True:
         try:
             raw_data = pd.read_csv(values[0], parse_dates=["SHIFT_DATE"])
         except:
-            print("Please ensure the data is correct.")
+            print("Please ensure the path to the data is correct.")
             continue
 
         # split data to train and val
@@ -131,8 +139,8 @@ while True:
                 current_count += 1
                 sg.OneLineProgressMeter('Fitting Models', current_count, size, 'fit_model', 'Model is fitting', orientation="horizontal")
 
-        current_count = 0
         # convert to week and calculating errors weekly
+        current_count = 0
         weekly = {}
         for i in split_data.keys():
             # create week column
@@ -167,7 +175,7 @@ while True:
             obs["error"] = error
             obs = obs.set_index("ds")
 
-            #
+            # model residuals
             period = int((np.max(timeframe) - np.min(timeframe)).dt.days)+1
             decomp = decompose(obs, period=period)
             weekly_fcast = forecast(decomp, steps=period, fc_func=drift, seasonal=True)
@@ -180,6 +188,7 @@ while True:
             weekly_yhat_lower = (weekly[i]["yhat_lower"] + resid_fcast).round(0)
             weekly_yhat_upper = (weekly[i]["yhat_upper"] + resid_fcast).round(0)
 
+            # replace negatives with 0s
             weekly[i]["yhat"] = weekly_yhat.where(weekly_yhat >= 0, 0)
             weekly[i]["yhat_lower"] = weekly_yhat_lower.where(weekly_yhat_lower >= 0, 0)
             weekly[i]["yhat_upper"] = weekly_yhat_upper.where(weekly_yhat_upper >= 0, 0)
@@ -187,7 +196,6 @@ while True:
             # create progress bar
             current_count += 1
             sg.OneLineProgressMeter('Compiling Results', current_count+1, size, 'compile_results','Results are compiling', orientation="horizontal")
-
 
         # create data/predictions folder if it doesn't exist
         predictions_path = "../data/predictions/"
@@ -201,3 +209,4 @@ while True:
         total_data.to_csv(predictions_path + "testui_predictions.csv")
 
         break
+window.Close()
