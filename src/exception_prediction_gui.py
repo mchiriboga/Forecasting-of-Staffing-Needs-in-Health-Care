@@ -3,6 +3,8 @@ import PySimpleGUI as sg
 import pandas as pd
 import numpy as np
 import os
+import matplotlib
+matplotlib.use("TkAgg")
 from fbprophet import Prophet
 from stldecompose import decompose, forecast
 from stldecompose.forecast_funcs import (naive, drift, mean, seasonal_naive)
