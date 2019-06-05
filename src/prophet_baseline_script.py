@@ -9,20 +9,23 @@ from stldecompose.forecast_funcs import (naive, drift, mean, seasonal_naive)
 
 def run_prophet(series, timeframe):
     """
-    Runs the Prophet
-
+    Runs the Prophet 
+    
     Key arguments:
     --------------
     series -- (DataFrame) time series data
-    timeframe -- (DataFrame) a DataFrame with one column
+    timeframe -- (DataFrame) a DataFrame with one column 
                  consisting of predicted dates
 
-    Returns:
+    Returns: 
     --------------
-    Returns the forecast of the predictions
+    Returns the forecast of the predictions 
 
     """
-    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, interval_width=0.95)
+    model = Prophet(yearly_seasonality=True, weekly_seasonality=True, daily_seasonality=False, 
+                    # changepoint_prior_scale=0.001,
+                    # mcmc_samples=300,
+                    interval_width=0.95)
     model.fit(series)
     forecast = model.predict(timeframe)
     return forecast, model
