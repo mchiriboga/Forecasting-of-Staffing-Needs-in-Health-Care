@@ -60,18 +60,18 @@ First, lets focus only on the `exception_hours.csv`, exploring how exceptions ar
 ```
 
     ## # A tibble: 10 x 2
-    ##    SITE                count
-    ##    <chr>               <int>
-    ##  1 St Paul's Hospital 420961
-    ##  2 Mt St Joseph        83590
-    ##  3 Holy Family         37197
-    ##  4 SVH Langara         29193
-    ##  5 PHC Corporate       24002
-    ##  6 Brock Fahrni        19530
-    ##  7 Youville Residence  15678
-    ##  8 SVH Honoria Conway   2799
-    ##  9 St John Hospice      2154
-    ## 10 Billable              555
+    ##    SITE                 count
+    ##    <chr>                <int>
+    ##  1 St Paul's Hospital 1186350
+    ##  2 Mt St Joseph        235379
+    ##  3 Holy Family         105264
+    ##  4 SVH Langara          82501
+    ##  5 PHC Corporate        67426
+    ##  6 Brock Fahrni         54460
+    ##  7 Youville Residence   44948
+    ##  8 SVH Honoria Conway    7659
+    ##  9 St John Hospice       6010
+    ## 10 Billable              1591
 
 **Observation:**
 
@@ -94,11 +94,11 @@ First, lets focus only on the `exception_hours.csv`, exploring how exceptions ar
     ## # A tibble: 5 x 2
     ##   LABOR_AGREEMENT  count
     ##   <chr>            <int>
-    ## 1 FAC             331743
-    ## 2 NURS            273104
-    ## 3 PARMED          117196
-    ## 4 EXCL             72624
-    ## 5 COM               4588
+    ## 1 FAC             935346
+    ## 2 NURS            769109
+    ## 3 PARMED          330389
+    ## 4 EXCL            206280
+    ## 5 COM              12728
 
 ``` r
 # Visualize the total number of exceptions by labor agreement facetting by site
@@ -151,16 +151,16 @@ head(fac_job_family, 10)
     ## # A tibble: 10 x 2
     ##    JOB_FAMILY_DESCRIPTION     count
     ##    <chr>                      <int>
-    ##  1 Clerical Other            112789
-    ##  2 Care Aide (Resident)       60886
-    ##  3 Licensed Practical Nurse   23228
-    ##  4 Unit Clerk                 21350
-    ##  5 Care Aide (Acute)          18767
-    ##  6 Clerical Clinical Support  18682
-    ##  7 Porter                     13133
-    ##  8 Sterile Supply             11099
-    ##  9 Therapy Aide                6237
-    ## 10 Clerical Health Records     5761
+    ##  1 Clerical Other            317783
+    ##  2 Care Aide (Resident)      171421
+    ##  3 Licensed Practical Nurse   65425
+    ##  4 Unit Clerk                 60512
+    ##  5 Care Aide (Acute)          53026
+    ##  6 Clerical Clinical Support  52386
+    ##  7 Porter                     36804
+    ##  8 Sterile Supply             31344
+    ##  9 Therapy Aide               17751
+    ## 10 Clerical Health Records    16507
 
 -   `NURS` job families (top 10)
 
@@ -179,16 +179,16 @@ head(nurs_job_family, 10)
     ## # A tibble: 10 x 2
     ##    JOB_FAMILY_DESCRIPTION     count
     ##    <chr>                      <int>
-    ##  1 Registered Nurse-DC1      228367
-    ##  2 Registered Nurse-DC2A Sup  17740
-    ##  3 Registered Nurse-DC2B      13511
-    ##  4 Licensed Practical Nurse    8573
-    ##  5 Registered Nurse-PS2        1659
-    ##  6 Registered Nurse-PS1        1024
-    ##  7 Registered Nurse-DC3         597
-    ##  8 Employed Student Nurse       517
-    ##  9 Registered Nurse-CH1         369
-    ## 10 Excluded Staff               268
+    ##  1 Registered Nurse-DC1      642994
+    ##  2 Registered Nurse-DC2A Sup  49769
+    ##  3 Registered Nurse-DC2B      38119
+    ##  4 Licensed Practical Nurse   24586
+    ##  5 Registered Nurse-PS2        4701
+    ##  6 Registered Nurse-PS1        2785
+    ##  7 Registered Nurse-DC3        1602
+    ##  8 Employed Student Nurse      1468
+    ##  9 Registered Nurse-CH1         961
+    ## 10 Excluded Staff               772
 
 -   `PARMED` job families (top 10)
 
@@ -207,16 +207,16 @@ head(parmed_job_family, 10)
     ## # A tibble: 10 x 2
     ##    JOB_FAMILY_DESCRIPTION       count
     ##    <chr>                        <int>
-    ##  1 Biomedical Engineering Tech  25194
-    ##  2 Health Records Administrator 22669
-    ##  3 Physiotherapist              11141
-    ##  4 Social Worker - MSW          10382
-    ##  5 Respiratory Therapist         8285
-    ##  6 Occupational Therapist        7233
-    ##  7 Other                         5661
-    ##  8 Dietitian                     5402
-    ##  9 Cardiology Technologist       4397
-    ## 10 Diagnostic Services Other     3669
+    ##  1 Biomedical Engineering Tech  70995
+    ##  2 Health Records Administrator 64322
+    ##  3 Physiotherapist              31679
+    ##  4 Social Worker - MSW          29149
+    ##  5 Respiratory Therapist        22985
+    ##  6 Occupational Therapist       20375
+    ##  7 Other                        15989
+    ##  8 Dietitian                    15212
+    ##  9 Cardiology Technologist      12331
+    ## 10 Diagnostic Services Other    10358
 
 #### `EXCEPTION_GROUP`
 
@@ -234,21 +234,21 @@ head(parmed_job_family, 10)
     ## # A tibble: 15 x 2
     ##    EXCEPTION_GROUP           count
     ##    <chr>                     <int>
-    ##  1 Other                    217748
-    ##  2 Vacation                 143861
-    ##  3 Paid Sick                 84793
-    ##  4 Swap                      83024
-    ##  5 Workload                  71522
-    ##  6 Vacancy                   55165
-    ##  7 Leave of Absence          41889
-    ##  8 Move                      23887
-    ##  9 Casual Sick or Cancelled  23357
-    ## 10 Unpaid Sick               12875
-    ## 11 On Call & Call Back       10968
-    ## 12 Work Related Injury        9990
-    ## 13 Schedule Adjustment        8646
-    ## 14 Education                  7415
-    ## 15 Relief Sick                4156
+    ##  1 Other                    614953
+    ##  2 Vacation                 406179
+    ##  3 Paid Sick                239368
+    ##  4 Swap                     232823
+    ##  5 Workload                 201520
+    ##  6 Vacancy                  155980
+    ##  7 Leave of Absence         118256
+    ##  8 Move                      66752
+    ##  9 Casual Sick or Cancelled  65555
+    ## 10 Unpaid Sick               36596
+    ## 11 On Call & Call Back       31058
+    ## 12 Work Related Injury       27866
+    ## 13 Schedule Adjustment       24522
+    ## 14 Education                 20975
+    ## 15 Relief Sick               11551
 
 Most exceptions fall under`Other`. Let's look at those to see what are some of the exception reasons associated under this group.
 
@@ -266,16 +266,16 @@ head(other_exception_reason, 10)
     ## # A tibble: 10 x 2
     ##    EXCEPTION_REASON                 count
     ##    <chr>                            <int>
-    ##  1 REG- Regular Hrs - MV- Move      34167
-    ##  2 PVC- Vacation Regular - MV- Move 29473
-    ##  3 REG- Regular Hrs                 24293
-    ##  4 FTE- Flex Time Earned NC         22000
-    ##  5 Vacant Shift - MV- Move          13445
-    ##  6 OGX- OT Meeting 1x               12207
-    ##  7 PSK- Sick Lv - MV- Move           6398
-    ##  8 REG- Wkld Increase - MV- Move     6188
-    ##  9 Swap shifts - MV- Move            3605
-    ## 10 ODO- OT on a day off (paid        3423
+    ##  1 REG- Regular Hrs - MV- Move      96340
+    ##  2 PVC- Vacation Regular - MV- Move 83246
+    ##  3 REG- Regular Hrs                 68823
+    ##  4 FTE- Flex Time Earned NC         62351
+    ##  5 Vacant Shift - MV- Move          37912
+    ##  6 OGX- OT Meeting 1x               34081
+    ##  7 PSK- Sick Lv - MV- Move          18235
+    ##  8 REG- Wkld Increase - MV- Move    17263
+    ##  9 Swap shifts - MV- Move           10430
+    ## 10 ODO- OT on a day off (paid        9694
 
 -   Focusing on `St Paul's Hospital` `EXCEPTION_GROUP` to check if the main groups are the same as the ones considering PHC as a whole.
 
@@ -292,21 +292,21 @@ head(other_exception_reason, 10)
     ## # A tibble: 15 x 2
     ##    EXCEPTION_GROUP           count
     ##    <chr>                     <int>
-    ##  1 Other                    117314
-    ##  2 Vacation                  69348
-    ##  3 Swap                      46102
-    ##  4 Workload                  42917
-    ##  5 Paid Sick                 39606
-    ##  6 Vacancy                   32106
-    ##  7 Leave of Absence          22229
-    ##  8 Move                      14271
-    ##  9 Casual Sick or Cancelled  10103
-    ## 10 Unpaid Sick                6444
-    ## 11 Schedule Adjustment        5503
-    ## 12 On Call & Call Back        4651
-    ## 13 Education                  4419
-    ## 14 Work Related Injury        3981
-    ## 15 Relief Sick                1967
+    ##  1 Other                    330748
+    ##  2 Vacation                 196258
+    ##  3 Swap                     128795
+    ##  4 Workload                 121045
+    ##  5 Paid Sick                112379
+    ##  6 Vacancy                   90733
+    ##  7 Leave of Absence          62288
+    ##  8 Move                      39826
+    ##  9 Casual Sick or Cancelled  28081
+    ## 10 Unpaid Sick               18492
+    ## 11 Schedule Adjustment       15572
+    ## 12 On Call & Call Back       13042
+    ## 13 Education                 12460
+    ## 14 Work Related Injury       11249
+    ## 15 Relief Sick                5382
 
 ``` r
 # Check the St Paul's Hospital total number of `Other` exceptions by each exception reason
@@ -322,16 +322,16 @@ head(other_exception_reason_st_paul, 10)
     ## # A tibble: 10 x 2
     ##    EXCEPTION_REASON                 count
     ##    <chr>                            <int>
-    ##  1 FTE- Flex Time Earned NC         17428
-    ##  2 REG- Regular Hrs - MV- Move      16691
-    ##  3 PVC- Vacation Regular - MV- Move 14307
-    ##  4 REG- Regular Hrs                 12837
-    ##  5 Vacant Shift - MV- Move           8947
-    ##  6 OGX- OT Meeting 1x                7275
-    ##  7 REG- Wkld Increase - MV- Move     3603
-    ##  8 PSK- Sick Lv - MV- Move           3052
-    ##  9 BGX- OT Bank Meeting 1x           2315
-    ## 10 REG- Working Off Site             1964
+    ##  1 FTE- Flex Time Earned NC         49696
+    ##  2 REG- Regular Hrs - MV- Move      46772
+    ##  3 PVC- Vacation Regular - MV- Move 40468
+    ##  4 REG- Regular Hrs                 36114
+    ##  5 Vacant Shift - MV- Move          25206
+    ##  6 OGX- OT Meeting 1x               20438
+    ##  7 REG- Wkld Increase - MV- Move    10114
+    ##  8 PSK- Sick Lv - MV- Move           8610
+    ##  9 BGX- OT Bank Meeting 1x           6450
+    ## 10 REG- Working Off Site             5439
 
 **Observations:**
 
@@ -369,16 +369,16 @@ Analyze `Vacation` and Sickness ('Paid Sick', 'Unpaid Sick', 'Relief Sick') `EXC
     ## # Groups:   year [5]
     ##     year  week count
     ##    <dbl> <dbl> <int>
-    ##  1  2013     1   296
-    ##  2  2013     2   172
-    ##  3  2013     3   134
-    ##  4  2013     4   126
-    ##  5  2013     5   137
-    ##  6  2013     6   142
-    ##  7  2013     7   198
-    ##  8  2013     8   174
-    ##  9  2013     9   128
-    ## 10  2013    10   150
+    ##  1  2013     1   859
+    ##  2  2013     2   473
+    ##  3  2013     3   367
+    ##  4  2013     4   381
+    ##  5  2013     5   425
+    ##  6  2013     6   419
+    ##  7  2013     7   574
+    ##  8  2013     8   483
+    ##  9  2013     9   401
+    ## 10  2013    10   399
     ## # … with 250 more rows
 
 ``` r
@@ -400,16 +400,16 @@ Analyze `Vacation` and Sickness ('Paid Sick', 'Unpaid Sick', 'Relief Sick') `EXC
     ## # Groups:   year [5]
     ##     year  week count
     ##    <dbl> <dbl> <int>
-    ##  1  2013     1   199
-    ##  2  2013     2   241
-    ##  3  2013     3   271
-    ##  4  2013     4   235
-    ##  5  2013     5   189
-    ##  6  2013     6   153
-    ##  7  2013     7   187
-    ##  8  2013     8   227
-    ##  9  2013     9   227
-    ## 10  2013    10   187
+    ##  1  2013     1   548
+    ##  2  2013     2   716
+    ##  3  2013     3   704
+    ##  4  2013     4   648
+    ##  5  2013     5   584
+    ##  6  2013     6   485
+    ##  7  2013     7   564
+    ##  8  2013     8   566
+    ##  9  2013     9   563
+    ## 10  2013    10   558
     ## # … with 250 more rows
 
 ``` r
@@ -643,16 +643,16 @@ excep_prod_hours_weekly %>%
     ## # Groups:   year [5]
     ##     year  week prod_hours excep_hours total_exceptions
     ##    <dbl> <dbl>      <dbl>       <dbl>            <dbl>
-    ##  1  2013    50     45577.       4818.              596
-    ##  2  2013    51     42356.       4766.              574
-    ##  3  2013    52     29639.       4011.              467
-    ##  4  2014     1     39126.       4414.              531
-    ##  5  2014     2     47063.       4602.              583
-    ##  6  2014    50     46329.       5370.              699
-    ##  7  2014    51     42251.       5131.              619
-    ##  8  2014    52     30295.       3977.              469
-    ##  9  2015     1     40492.       4360.              526
-    ## 10  2015     2     47767.       4658.              608
+    ##  1  2013    50    148659.      41753.             5537
+    ##  2  2013    51    140101.      44587.             5663
+    ##  3  2013    52    100247.      37528.             4672
+    ##  4  2014     1    128029.      36275.             4618
+    ##  5  2014     2    152533.      39065.             5194
+    ##  6  2014    50    152127.      44931.             5910
+    ##  7  2014    51    142625.      45395.             5859
+    ##  8  2014    52    103790.      37741.             4761
+    ##  9  2015     1    133006.      36549.             4859
+    ## 10  2015     2    156041.      40463.             5619
     ## # … with 13 more rows
 
 -   At a glance, the expectation would be for weeks with lower productive hours to have higher exceptions (number and/or hours). However, this doesn't seem to be true for week 52, as all values are lower than other weeks.
