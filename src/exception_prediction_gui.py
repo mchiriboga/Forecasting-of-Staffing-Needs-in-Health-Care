@@ -33,6 +33,7 @@ def run_prophet(series, timeframe):
     model.fit(series)
     forecast = model.predict(timeframe)
     return forecast, model
+
 sg.ChangeLookAndFeel('BlueMono')
 sg.SetOptions(element_padding=(10,3))
 
@@ -125,7 +126,6 @@ while True:
                         pred_results[(i, j, k)], models[(i, j, k)] = run_prophet(temp_data, timeframe_future)
                         print("Fitting -", i, j, k, ": Done")
 
-
                     # create progress bar
                     current_count += 1
                     sg.OneLineProgressMeter('Fitting models.', current_count, size, 'fit_model', 'Fitting models.', orientation="horizontal")
@@ -145,14 +145,14 @@ while True:
             weekly_yhat_upper = combined.groupby("ds").yhat_upper.sum().round(0).astype(int).reset_index()
 
             # merge weekly results
-            weekly[i] = pd.concat([weekly_yhat["yhat"],
+            weekly[i] = pd.concat([weekly_yhat["ds"], weekly_yhat["yhat"],
                                    weekly_yhat_lower["yhat_lower"],
                                    weekly_yhat_upper["yhat_upper"]], axis=1)
 
+
             # create columns "year", "site", "JOB_FAMILY"
             length = weekly[i].shape[0]
-            weekly[i]["ds"] = combined["ds"]
-            weekly[i]["week"] = combined["ds"].dt.weekofyear
+            weekly[i]["week"] = weekly[i]["ds"].dt.weekofyear
             weekly[i]["site"] = np.repeat(i[0], length)
             weekly[i]["job_family"] = np.repeat(i[1], length)
             weekly[i]["sub_program"] = np.repeat(i[2], length)
@@ -193,7 +193,6 @@ while True:
         predictions_path = "../data/predictions/"
         if not os.path.exists(predictions_path):
             os.mkdir(predictions_path)
-
 
         # export to "data/predictions/" directory
         total_data = pd.DataFrame()
