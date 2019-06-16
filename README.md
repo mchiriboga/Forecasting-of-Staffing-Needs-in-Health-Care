@@ -14,3 +14,5 @@ Forecasting of Staffing Needs
  |Proposal Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.ipynb)|
  ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.pdf)|
  | Proposal Report |[Proposal link](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/proposal.pdf)|
+ |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation_slides.ipynb)|
+ ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation.pdf)|
