@@ -35,7 +35,7 @@ As you can see, the overall accuracy is not bad. But if we break it down to ever
 The comparison of our model accuracy. We can see that the accuracy of overtime and relief not needed has increased while losing some accuracy of Straight time. Since the Overtime is more critical to PHC, the sacrifice of straight time is acceptable, and our final test accuracy is listed in the right column.
 
 | | Original Validation | Adjusted Validation | Adjusted Test |
-|--------------------|-------|-------|
+|--------------------|-------|-------|-------|
 | Overall | 0.841 | 0.794 | 0.800 |
 | Straight Time | 0.936 | 0.823 | 0.830 |
 | Overtime and Beyond| 0.638 | 0.735 | 0.756 |
