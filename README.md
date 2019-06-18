@@ -18,7 +18,7 @@ Forecasting of Staffing Needs
  |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation_slides.ipynb)|
  ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation.pdf)|
 
-### Setup
+## Setup
 To install all the necessary packages, please navigate to the root directory and install the necessary packages through the following codes:
 
 If you are using Mac, please open `Terminal` and enter the following:
@@ -32,9 +32,9 @@ If you are using Windows, please open any command prompt window and enter the fo
 sh setup.sh
 ```
 
-### How to use:
+## How to use:
 
-#### Exception Count Prediction Tool:
+### Exception Count Prediction Tool:
 This tool allows you to train your data and predict the number of exceptions for a given timeframe. The predicted data will be outputted into a directory under `/data/predictions/`. The predicted file would be called `predictions.csv`. To use this tool, please enter the following into terminal or command prompt:
 
 ```
