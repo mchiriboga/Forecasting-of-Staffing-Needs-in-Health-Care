@@ -18,19 +18,28 @@ We used validation set to test our model, the best result we have is listed belo
 
 | |Accuracy|
 |--------------------|-------|
-| Validation | 0.841|
+| Validation | 0.841 |
 | Straight Time | 0.936 |
 | Overtime and Beyond| 0.638 |
 | Relief Not Needed| 0.308 |
 
 
-As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since the Overtime costs more than Straight time, we need to improve the accuracy of overtime.
+As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since the Overtime costs more than Straight time, we need to improve the accuracy of overtime. The reason caused the gap between categories is imbalanced data.  We found out that the number of straight time is way more than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. So we updated our model to make it more balanced.
 
-The reason caused the gap between categories is imbalanced data.  We found out that the number of straight time is way more than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. So we updated our model to make it more balanced.
-
-
+| Exceptions | Amount |
+|--------------------|-------|
+| Straight Time | 262,608 |
+| Overtime and Beyond| 76,863 |
+| Relief Not Needed| 11,806 |
 
 The comparison of our model accuracy. We can see that the accuracy of overtime and relief not needed has increased while losing some accuracy of Straight time. Since the Overtime is more critical to PHC, the sacrifice of straight time is acceptable, and our final test accuracy is listed in the right column.
+
+| | Original Validation | Adjusted Validation | Adjusted Test |
+|--------------------|-------|-------|
+| Overall | 0.841 | 0.794 | 0.800 |
+| Straight Time | 0.936 | 0.823 | 0.830 |
+| Overtime and Beyond| 0.638 | 0.735 | 0.756 |
+| Relief Not Needed| 0.308 | 0.625 | 0.633 |
 
 This model’s output file is also a .csv file which adds two columns to the input data, one is the shift of exceptions per partner’s request. The other one is our prediction result. 
 
@@ -42,8 +51,4 @@ The first one is that the missing data. Due to technical reasons, some of our da
 
 The second one is the feature selection. Though current features has proper performance, we still want to improved it to the next level. We would focus on discovering new features to improve the accuracy, if time allows.
 
-During the prestation, we learned that the LightBGM might have a better performance than random forest, which is impressive. Due to time and resource limits, we didn’t test this model. 
-
-
-
-
+During the prestation, we learned that the LightBGM might have a better performance than random forest, which is impressive. Due to time and resource limits, we didn’t try to implement this model. 
