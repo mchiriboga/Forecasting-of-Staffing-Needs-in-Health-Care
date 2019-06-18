@@ -1,4 +1,4 @@
-##Data science methods
+## Data science methods
 ### Exception Classification
 
 The classification model is using random forests to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have been created but yet been fulfilled, so the HR may change their priority to handling some exceptions to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, random forests performs best. And the interoperability is better than the other two, hence we agreed to choose random forests as our model.
@@ -14,7 +14,17 @@ The classification model is using random forests to predict the possible outcome
 We applied the forward selection method to implement feature selection. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(which is staff response time) to setup accuracy baseline, then added other features to see if it could increase model accuracy. After several tests, the following features are the rest of the features in our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
 
 
-After that, we used validation set to test our model, the best result we have is listed below. As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since the Overtime costs more than Straight time, we need to improve the accuracy of overtime.
+We used validation set to test our model, the best result we have is listed below. 
+
+| |Accuracy|
+|--------------------|-------|
+| Validation | 0.841|
+| Straight Time | 0.936 |
+| Overtime and Beyond| 0.638 |
+| Relief Not Needed| 0.308 |
+
+
+As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since the Overtime costs more than Straight time, we need to improve the accuracy of overtime.
 
 The reason caused the gap between categories is imbalanced data.  We found out that the number of straight time is way more than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. So we updated our model to make it more balanced.
 
