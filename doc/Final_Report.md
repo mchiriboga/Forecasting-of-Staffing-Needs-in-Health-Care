@@ -19,7 +19,7 @@ We used validation set to test our model, the best result we have is listed belo
 <center>
 
 | |Accuracy|
-|--------------------|-------|
+|--------------------|:-------:|
 | Validation | 0.841 |
 | Straight Time | 0.936 |
 | Overtime and Beyond| 0.638 |
@@ -32,7 +32,7 @@ As you can see, the overall accuracy is not bad. But if we break it down to ever
 <center>
 
 | Exceptions | Amount |
-|--------------------|-------|
+|--------------------|:-------:|
 | Straight Time | 262,608 |
 | Overtime and Beyond| 76,863 |
 | Relief Not Needed| 11,806 |
@@ -44,7 +44,7 @@ The comparison of our model accuracy. We can see that the accuracy of overtime a
 <center>
 
 | | Original Validation | Adjusted Validation | Adjusted Test |
-|--------------------|-------|-------|-------|
+|--------------------|:-------:|:-------:|:-------:|
 | Overall | 0.841 | 0.794 | 0.800 |
 | Straight Time | 0.936 | 0.823 | 0.830 |
 | Overtime and Beyond| 0.638 | 0.735 | 0.756 |
