@@ -17,14 +17,12 @@ We applied the forward selection method to implement feature selection. We used 
 We used validation set to test our model, the best result we have is listed below. 
 
 <center>
-
 | |Accuracy|
 |--------------------|:-------:|
 | Validation | 0.841 |
 | Straight Time | 0.936 |
 | Overtime and Beyond| 0.638 |
 | Relief Not Needed| 0.308 |
-
 </center>
 
 As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since the Overtime costs more than Straight time, we need to improve the accuracy of overtime. The reason caused the gap between categories is imbalanced data.  We found out that the number of straight time is way more than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. So we updated our model to make it more balanced.
