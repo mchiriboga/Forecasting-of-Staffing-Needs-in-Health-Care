@@ -7,7 +7,7 @@ The classification model is using random forests to predict the possible outcome
 
 - Straight time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
 
-- Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate. 
+- Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company. 
 
 - Relief Not Needed, which is neutral to the company.
 
