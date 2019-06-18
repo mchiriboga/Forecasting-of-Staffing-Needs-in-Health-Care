@@ -3,10 +3,11 @@
 Forecasting of Staffing Needs
 
 ### Contributors:
-- [Davy Guo](https://github.com/DavyGuo)
-- [Iris Yang](https://github.com/lyiris22)
+
+- [Luo (Iris) Yang](https://github.com/lyiris22)
 - [Marcelle Chiriboga](https://github.com/mchiriboga)
 - [Patrick Tung](https://github.com/tungpatrick)
+- [Weifeng (Davy) Guo](https://github.com/DavyGuo)
 
 ### Milestones:
  |Deliverable|Link|
