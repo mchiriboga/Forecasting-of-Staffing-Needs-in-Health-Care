@@ -31,7 +31,7 @@ As you can see, the overall accuracy is not bad. But if we break it down to ever
 
 <center>
 
-| Exceptions | Amount |
+|  | Amount |
 |--------------------|:-------:|
 | Straight Time | 262,608 |
 | Overtime and Beyond| 76,863 |
