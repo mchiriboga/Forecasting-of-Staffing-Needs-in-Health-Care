@@ -1,20 +1,50 @@
-## Data science methods
+# Forecasting of Staffing Needs in Health Care
+
+
+June, 2019                               
+
+
+Contributors: [Luo (Iris) Yang](https://github.com/lyiris22), [Marcelle Chiriboga](https://github.com/mchiriboga), [Patrick Tung](https://github.com/tungpatrick), [Weifeng (Davy) Guo](https://github.com/DavyGuo)
+
+Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+
+
+## Executive Summary
+
+For most positions in the healthcare business, any staff absences must always be filled in by another staff and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
+
+The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions are made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time, vacation, maternity leave, etc.
+
+## Introduction
+
+An increase in patients' waiting time at hospitals or the postponement of important procedures, such as surgeries, are known to be critical, which is why medical institutions try to make sure that their clinical positions have backups whenever possible. On the other hand, more than 70% of the operational costs in health care are tied to staffing and, overstaffing can result in a significant increase in these costs.
+
+PHC is a government agency that operates more than 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impacts both in terms of cost to the organization and in quality of care provided to patients, and for this reason, accurately forecasting staffing needs can have a very positive impact.
+
+In this project, we partnered with PHC to predict staff needs based in their historical exception records, focusing our predictions on the *operational level*, i.e. short term needs, specifically on a time horizon of less than a month. The goal was to answer the question “how many backup staff does PHC need on a weekly basis to have a full staff?”, giving them more time to handle the exceptions. More specifically we focused on building models for:
+
+- Forecasting staffing needs on a weekly basis, allowing PHC to estimate how many back up staff are needed per site, subprogram, and job family;
+- Forecasting how many exceptions will fall under the urgent exception groups (i.e. overtime and relief not found), allowing PHC to prioritize which exceptions to pay extra attention to in finding relief for;
+- Classifying each exception logged on PHC's internal system in one of three possible categories.
+
+## Data Science Methods
+
 ### Exception Classification
 
 The classification model is using random forests to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have been created but yet been fulfilled, so the HR may change their priority to handling some exceptions to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, random forests performs best. And the interoperability is better than the other two, hence we agreed to choose random forests as our model.
 
 `EARNING_CATEGORY` is the label in our model.  it  has 12 values which is too detailed for our prediction and affect the model accuracy hugely. Per partner’s advice, as long as the relief type (like straight time) is the same, we can treat them as the same. Hence, we group the 12 labels into 3 labels, which are:
 
-- Straight time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
+- Straight Time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
 
-- Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company. 
+- Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company.
 
 - Relief Not Needed, which is neutral to the company.
 
 We applied the forward selection method to implement feature selection. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(which is staff response time) to setup accuracy baseline, then added other features to see if it could increase model accuracy. After several tests, the following features are the rest of the features in our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
 
 
-We used validation set to test our model, the best result we have is listed below. 
+We used validation set to test our model, the best result we have is listed below.
 
 <center>
 
@@ -51,10 +81,10 @@ The comparison of our model accuracy. We can see that the accuracy of overtime a
 | Relief Not Needed| 0.308 | 0.625 | 0.633 |
 
 </center>
-  
-This model’s output file is also a .csv file which adds two columns to the input data, one is the shift of exceptions per partner’s request. The other one is our prediction result. 
 
-### Difficulties, limitations, and potential improvement
+This model’s output file is also a .csv file which adds two columns to the input data, one is the shift of exceptions per partner’s request. The other one is our prediction result.
+
+#### Difficulties, Limitations, and Potential Improvements
 
 Through the whole project, there are 2 main difficulties.
 
@@ -62,4 +92,34 @@ The first one is that the missing data. Due to technical reasons, some of our da
 
 The second one is the feature selection. Though current features has proper performance, we still want to improved it to the next level. We would focus on discovering new features to improve the accuracy, if time allows.
 
-During the prestation, we learned that the LightBGM might have a better performance than random forest, which is impressive. Due to time and resource limits, we didn’t try to implement this model. 
+During the presentation, we learned that the LightBGM might have a better performance than random forest, which is impressive. Due to time and resource limits, we didn’t try to implement this model.
+
+## Data Product and results
+
+### Dashboard
+
+We implemented the dashboard using Tableau, where we consolidated the three models. It has three different tabs:
+
+- Predictions
+
+This tab displays two charts stacked vertically.
+
+The top chart shows how many exceptions are being predicted in a weekly basis by different sites, job families, and sub-program. The orange series corresponds to the predicted numbers of exceptions, while the grey ones represent the 95% confidence interval.
+
+The bottom chart displays how many urgent exceptions, which includes overtime and relief not found, are being predicted. The different bar colors correspond to different job families.
+
+<div align="center"><img src="img/dashboard_predictions.png"></div>
+
+- Exceptions Classification
+
+This tab displays a summary table, where the user can easily see how many exceptions of each label is already on PHC's system. The user can filter by date and site.
+
+<div align="center"><img src="img/dashboard_classification.png"></div>
+
+- Productive vs. Exception Hours
+
+This tab displays a comparison between the productive and exception hours based on historical data. The user can filter by date, site, and job family.
+
+<div align="center"><img src="img/dashboard_history.png"></div>
+
+## Conclusions and Recommendations
