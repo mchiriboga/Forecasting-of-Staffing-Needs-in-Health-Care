@@ -84,7 +84,7 @@ The comparison of our model accuracy. We can see that the accuracy of overtime a
 
 This model’s output file is also a .csv file which adds two columns to the input data, one is the shift of exceptions per partner’s request. The other one is our prediction result.
 
-### Difficulties, Limitations, and Potential Improvements
+#### Difficulties, Limitations, and Potential Improvements
 
 Through the whole project, there are 2 main difficulties.
 
@@ -93,3 +93,33 @@ The first one is that the missing data. Due to technical reasons, some of our da
 The second one is the feature selection. Though current features has proper performance, we still want to improved it to the next level. We would focus on discovering new features to improve the accuracy, if time allows.
 
 During the presentation, we learned that the LightBGM might have a better performance than random forest, which is impressive. Due to time and resource limits, we didn’t try to implement this model.
+
+## Data Product and results
+
+### Dashboard
+
+We implemented the dashboard using Tableau, where we consolidated the three models. It has three different tabs:
+
+- Predictions
+
+This tab displays two charts stacked vertically.
+
+The top chart shows how many exceptions are being predicted in a weekly basis by different sites, job families, and sub-program. The orange series corresponds to the predicted numbers of exceptions, while the grey ones represent the 95% confidence interval.
+
+The bottom chart displays how many urgent exceptions, which includes overtime and relief not found, are being predicted. The different bar colors correspond to different job families.
+
+<div align="center"><img src="img/dashboard_predictions.png"></div>
+
+- Exceptions Classification
+
+This tab displays a summary table, where the user can easily see how many exceptions of each label is already on PHC's system. The user can filter by date and site.
+
+<div align="center"><img src="img/dashboard_classification.png"></div>
+
+- Productive vs. Exception Hours
+
+This tab displays a comparison between the productive and exception hours based on historical data. The user can filter by date, site, and job family.
+
+<div align="center"><img src="img/dashboard_history.png"></div>
+
+## Conclusions and Recommendations
