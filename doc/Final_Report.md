@@ -17,6 +17,16 @@ The purpose of the project was to help the People Analytics and Innovation Team 
 
 ## Introduction
 
+An increase in patients' waiting time at hospitals or the postponement of important procedures, such as surgeries, are known to be critical, which is why medical institutions try to make sure that their clinical positions have backups whenever possible. On the other hand, more than 70% of the operational costs in health care are tied to staffing and, overstaffing can result in a significant increase in these costs.
+
+PHC is a government agency that operates more than 16 healthcare facilities in British Columbia, with almost 7,000 staff, including 1,000 medical staff. At their scale, under or over staffing can have significant impacts both in terms of cost to the organization and in quality of care provided to patients, and for this reason, accurately forecasting staffing needs can have a very positive impact.
+
+In this project, we partnered with PHC to predict staff needs based in their historical exception records, focusing our predictions on the *operational level*, i.e. short term needs, specifically on a time horizon of less than a month. The goal was to answer the question “how many backup staff does PHC need on a weekly basis to have a full staff?”, giving them more time to handle the exceptions. More specifically we focused on building models for:
+
+- Forecasting staffing needs on a weekly basis, allowing PHC to estimate how many back up staff are needed per site, subprogram, and job family;
+- Forecasting how many exceptions will fall under the urgent exception groups (i.e. overtime and relief not found), allowing PHC to prioritize which exceptions to pay extra attention to in finding relief for;
+- Classifying each exception logged on PHC's internal system in one of three possible categories.
+
 ## Data Science Methods
 
 ### Exception Classification
@@ -25,7 +35,7 @@ The classification model is using random forests to predict the possible outcome
 
 `EARNING_CATEGORY` is the label in our model.  it  has 12 values which is too detailed for our prediction and affect the model accuracy hugely. Per partner’s advice, as long as the relief type (like straight time) is the same, we can treat them as the same. Hence, we group the 12 labels into 3 labels, which are:
 
-- Straight time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
+- Straight Time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
 
 - Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company.
 
