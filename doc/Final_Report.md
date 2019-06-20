@@ -29,6 +29,10 @@ In this project, we partnered with PHC to predict staff needs based in their his
 
 ## Data Science Methods
 
+### Urgent Exception Prediction
+
+
+
 ### Exception Classification
 
 The classification model is using random forests to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have been created but yet been fulfilled, so the HR may change their priority to handling some exceptions to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, random forests performs best. And the interoperability is better than the other two, hence we agreed to choose random forests as our model.
