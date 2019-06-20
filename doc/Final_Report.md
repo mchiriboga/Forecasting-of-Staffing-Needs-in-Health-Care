@@ -50,6 +50,29 @@ To tune our models, we took a look at the Mean Absolute Error. The MAE provides 
 
 </center>
 
+### Urgent Exception Predictions
+
+Beside predicting the total count of exceptions, we also focus on the number of exceptions that are urgent. According to the strategies of backfilling the exceptions in PHC, "overtime" is the last solution to consider due to the high cost. If no backfill is available, the exception will be marked as "relief not found". These two kind of exceptions together is considered "urgent". We want to forecast approximately how many urgent exceptions will be, giving HR an insight so that they can make arrangement before hand to minimize loss.
+
+We use linear regression instead of time series for this part due to higher accuracy. We removed year 2014 from the training set, since the pattern is much different than the years after. Similarly, we also consider only the top three nurse groups, which are `DC1000`, `DC2A00` and `DC2B00` in `JOB_FAMILY` in the original data. As PHC mentioned that they are working on the system to switch shifts among different sites, we did not split by sites as in the overall forecasting.
+
+The predictors of the linear regression model are shift dates and productive hours. Shift dates are transformed into one-hot encoding, considering day of week, day of month, week of year and month of year. For the productive hours, even though we do not have exact data for the future period, we can use estimations according to shift arrangements. A graph of testing result for this model is shown below.
+
+<div align="center"><img src="img/urgent_1.png"></div>
+
+For some peaks in the daily basis, the linear model are not able to predict them accurately due to random events. The problem is more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, such as some new variables related to the operation for each hospital. But in general, the model has captured the general pattern sufficiently and made good predictions for most of the days. The Mean Absolute error for each group of 2018 is listed below.
+
+<center>
+
+| JOB_FAMILY | MAEs |
+| --- | --- |
+| DC1000 | 18.35 |
+| DC2A00| 3.79 |
+| DC2B00 | 2.19 |
+
+</center>
+
+
 ### Exception Classification
 
 The classification model uses random forest classifiers to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have been created but yet been fulfilled, so the HR may change their priority to handling some exceptions to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, random forests performs best. And the interoperability is better than the other two, hence we agreed to choose random forest classifiers as our model.
