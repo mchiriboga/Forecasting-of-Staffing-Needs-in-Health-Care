@@ -44,5 +44,13 @@ python exception_prediction_gui.py
 You can then select the file you want to train with (i.e. `exception_hours.csv`), and input the start and end date of the prediction timeframe.
 
 ### Urgent Exception Prediction Tool:
+This tool allows you to train your data an predict the number of urgent exceptions, given the productive hours of the period you want to predict. The predicted data will be saved in `/data/predictions`. The predicted file would be called `urgent_predictions.csv`. To use this tool, please enter the following into terminal or command prompt:
+
+```
+cd src
+python urgent_prediction_gui.py
+```
+
+You will need a file of exception hours and a file of productive hours for past years as training data. Also you will need a file of productive hours for the period you want to predict, which can be an estimation.
 
 ### Exception Classification Tool:
