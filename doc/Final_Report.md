@@ -24,8 +24,8 @@ PHC is a government agency that operates more than 16 healthcare facilities in B
 In this project, we partnered with PHC to predict staff needs based in their historical exception records, focusing our predictions on the *operational level*, i.e. short term needs, specifically on a time horizon of less than a month. The goal was to answer the question: _"How should PHC prepare for their weekly staffing needs in order to effectively operate with a full staff?"_, giving them more time to handle the exceptions. More specifically we focused on building models for:
 
 - Forecasting staffing needs on a weekly basis, allowing PHC to estimate how many back up staff are needed per site, subprogram, and job family;
-- Forecasting how many exceptions will fall under the urgent exception groups (i.e. overtime and relief not found), allowing PHC to prioritize which exceptions to pay extra attention to in finding relief for;
-- Classifying each exception logged on PHC's internal system in one of three possible categories.
+- Forecasting how many exceptions will fall under the urgent groups (i.e. overtime and relief not found), so PHC can be better prepared to find relief for critical exceptions;
+- Classifying each exception logged on PHC's internal system in one of three possible categories, allowing PHC to prioritize which exceptions to pay extra attention to in finding relief for.
 
 ## Data Science Methods
 

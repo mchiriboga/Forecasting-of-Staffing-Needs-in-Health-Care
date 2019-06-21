@@ -1,16 +1,15 @@
-#!/usr/bin/env python
-# 
-# This script takes exception and productive hours data
-# From past year as training data
+#!/bin/env python
+#
+# This script generates an user interface
+# Takes exception and productive hours data from past year as training
 # Takes the productive hours data of the period to predict
 # Produces the number of urgent exceptions
 # On a daily basis in the period you want to predict
 # Generate the output in a csv file
 
-# example usage
-# Python urgent_prediction.py exception_train 2018-01-01 productive_train productive_pred result
-
 # import packages
+import PySimpleGUI as sg
+import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -18,70 +17,12 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LinearRegression
 import argparse
 
-# read in command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('excep_train')  # exception training data
-parser.add_argument('valid_until')  # YYYY-MM-DD, date that the training data is valid until
-parser.add_argument('prod_train')  # productive hours training data
-parser.add_argument('prod_pred')  # productive hours prediction data
-parser.add_argument('result')  # path of file to save the result
-args = parser.parse_args()
-
-# main function
-def main():
-    '''
-    Main function that generates the result.
-    '''
-
-    # load data
-    excep_train = pd.read_csv(args.excep_train)
-    prod_train = pd.read_csv(args.prod_train)
-    prod_pred = pd.read_csv(args.prod_pred)
-
-    # data wrangling
-    # exclude data of 2014 from the training data to generate better results
-    excep_train_full = excep_train[(excep_train["SHIFT_DATE"] < "2014-01-01") |
-                           ((excep_train["SHIFT_DATE"] > "2014-12-31") & (excep_train['SHIFT_DATE'] < args.valid_until))]
-    prod_train_full = prod_train[(prod_train["SHIFT_DATE"] < "2014-01-01") |
-                      ((prod_train["SHIFT_DATE"] > "2014-12-31") & (prod_train['SHIFT_DATE'] < args.valid_until))]
-
-    # prediction for DC1000
-    excep_train_dc1 = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC1000"]
-    prod_train_dc1 = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC1"]
-    prod_pred_dc1 = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC1"]
-
-    result_dc1 = fit_predict(excep_train_dc1, prod_train_dc1, prod_pred_dc1)
-    result_dc1['job_family'] = "DC1000"
-
-    # prediction for DC2A00
-    excep_train_dc2a = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC2A00"]
-    prod_train_dc2a = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2A Sup"]
-    prod_pred_dc2a = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2A Sup"]
-
-    result_dc2a = fit_predict(excep_train_dc2a, prod_train_dc2a, prod_pred_dc2a)
-    result_dc2a['job_family'] = "DC2A00"
-
-    # prediction for DC2B00
-    excep_train_dc2b = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC2B00"]
-    prod_train_dc2b = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2B"]
-    prod_pred_dc2b = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2B"]
-
-    result_dc2b = fit_predict(excep_train_dc2b, prod_train_dc2b, prod_pred_dc2b)
-    result_dc2b['job_family'] = "DC2B00"
-
-    # generate result
-    output = pd.concat([result_dc1, result_dc2a, result_dc2b])
-    output_num = output._get_numeric_data()
-    output_num[output_num < 0] = 0  # convert negative values to zero
-    
-    # save result file
-    output.to_csv(args.result)
-
+# Functions
+# prepare data and runs linear regression model
 
 def day_X(df, productive, enc = OneHotEncoder(handle_unknown='ignore', sparse = False), method = "train"):
     '''
     Generate the predictors to be used in the linear regression model.
-
     Args:
         df (pandas dataframe): exception hours data
         productive (pandas dataframe): productive hours data
@@ -91,7 +32,6 @@ def day_X(df, productive, enc = OneHotEncoder(handle_unknown='ignore', sparse = 
     Returns:
         dates (pandas dataframe): predictors data
         enc (OneHotEncoder object): the encoder used in this method
-
     '''
 
     # decide whether the output is for training data or predicting data
@@ -148,14 +88,12 @@ def day_X(df, productive, enc = OneHotEncoder(handle_unknown='ignore', sparse = 
 def day_y(df, X):
     '''
     Generate the labels to be used in the linear regression model.
-
     Args:
         df (pandas dataframe): exception hours data
         X (pandas dataframe): predictors that is already generated
     
     Returns:
         combined.y (list): labels data
-
     '''
     
     # keep only the urgent groups we care about
@@ -173,7 +111,6 @@ def day_y(df, X):
 def fit_predict(excep_train, prod_train, prod_pred):
     '''
     Fit a linear regression model and make predictons.
-
     Args:
         excep_train (pandas dataframe): exception hours data
         prod_train (pandas dataframe): productive data for training
@@ -181,7 +118,6 @@ def fit_predict(excep_train, prod_train, prod_pred):
     
     Returns:
         prediction (pandas dataframe): urgent prediction
-
     '''
     
     # generate training data
@@ -204,6 +140,92 @@ def fit_predict(excep_train, prod_train, prod_pred):
     
     return prediction
 
-# call main function
-if __name__ == "__main__":
-    main()
+
+# User Interface
+# allow inputs and outputs
+
+# use same setting for the interface
+sg.SetOptions(element_padding=(10,3))
+
+# layout structure
+layout = [
+    [sg.Text('Import training file', size=(35, 1))],
+    [sg.Text('Exception Hours', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(os.path.abspath(os.path.join(os.getcwd(), "../data/exception_hours.csv"))), sg.FileBrowse()],
+    [sg.Text('Productive Hours', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(os.path.abspath(os.path.join(os.getcwd(), "../data/productive_hours_train.csv"))), sg.FileBrowse()],
+    [sg.Text('Import predicting file', size=(35, 1))],
+    [sg.Text('Productive Hours', size=(15, 1), auto_size_text=False, justification='right'), sg.InputText(os.path.abspath(os.path.join(os.getcwd(), "../data/productive_hours_pred.csv"))), sg.FileBrowse()],
+    [sg.Submit(), sg.Cancel()],
+    ]
+
+# setup layout
+window = sg.Window('Urgent Count Prediction Tool', grab_anywhere=False).Layout(layout)
+
+while True:
+    event, values = window.Read()
+
+    if event is None or event == "Cancel":
+        break
+    elif event == "Submit":
+        # try if the data is readable
+        try:
+            excep_train = pd.read_csv(values[0])
+            prod_train = pd.read_csv(values[1])
+            prod_pred = pd.read_csv(values[2])
+        except:
+            print("Please enter valid file paths.")
+            continue
+
+        # generating
+        try:
+            # exclude data of 2014 from the training data to generate better results
+            excep_train_full = excep_train[(excep_train["SHIFT_DATE"] < "2014-01-01") | ((excep_train["SHIFT_DATE"] > "2014-12-31") & (excep_train['SHIFT_DATE'] < "2018-01-01"))]
+            prod_train_full = prod_train[(prod_train["SHIFT_DATE"] < "2014-01-01") | ((prod_train["SHIFT_DATE"] > "2014-12-31") & (prod_train['SHIFT_DATE'] < "2018-01-01"))]
+
+            # prediction for DC1000
+            excep_train_dc1 = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC1000"]
+            prod_train_dc1 = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC1"]
+            prod_pred_dc1 = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC1"]
+
+            result_dc1 = fit_predict(excep_train_dc1, prod_train_dc1, prod_pred_dc1)
+            result_dc1['job_family'] = "DC1000"
+
+            # prediction for DC2A00
+            excep_train_dc2a = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC2A00"]
+            prod_train_dc2a = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2A Sup"]
+            prod_pred_dc2a = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2A Sup"]
+
+            result_dc2a = fit_predict(excep_train_dc2a, prod_train_dc2a, prod_pred_dc2a)
+            result_dc2a['job_family'] = "DC2A00"
+
+            # prediction for DC2B00
+            excep_train_dc2b = excep_train_full[excep_train_full["JOB_FAMILY"] == "DC2B00"]
+            prod_train_dc2b = prod_train_full[prod_train_full["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2B"]
+            prod_pred_dc2b = prod_pred[prod_pred["JOB_FAMILY_DESCRIPTION"] == "Registered Nurse-DC2B"]
+
+            result_dc2b = fit_predict(excep_train_dc2b, prod_train_dc2b, prod_pred_dc2b)
+            result_dc2b['job_family'] = "DC2B00"
+
+            # generate result
+            output = pd.concat([result_dc1, result_dc2a, result_dc2b])
+            output_num = output._get_numeric_data()
+            output_num[output_num < 0] = 0  # convert negative values to zero
+        
+        except:
+            print("Please check if your dataframe is valid.")
+            continue 
+
+        # save the prediction to the folder
+        save_path = "../data/predictions/"
+        try:
+            # check if the file path is valid
+            if not os.path.exists(save_path):
+                os.mkdir(save_path)
+        except:
+            print("Please enter valid file path.")
+            continue
+        
+        # export the file
+        output.to_csv(save_path + "urgent_predictions.csv")
+        break
+ 
+window.Close()
