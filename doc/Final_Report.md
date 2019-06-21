@@ -145,6 +145,10 @@ After having heard the presentation from our program, we learned that using a Li
 
 The Exception Count Prediction Tool is delivered through a script that generates a user interface that is easy to use. The interface can be run on both Windows computers and Mac computers, and it uses the same code to run. The interface has two parts, the top asks for the user to input the training data, which is the raw `exception_hours.csv` file that PHC has provided us. After including the correct type of data, the user will need to input a prediction timeframe. After clicking "Submit", our time series models will run and generate a `.csv` file that would provide all the relevant predictions regarding the number of exceptions Providence Health Care would have within the prediction timeframe.
 
+### Urgent Exception Predictions
+
+The Urgent Exception Prediction Tool is also delivered through a script that generates a user interface similar with the Exception Count Predictions. It requires a file of exception hours and a file of productive hours for past years as training data, as well as a file of productive hours for the period to predict, which can be an estimation. The output is a `.csv` file with prediction results in the given time period.
+
 ### Dashboard
 
 We implemented the dashboard using Tableau, where we consolidated the three models. It has three different tabs:
