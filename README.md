@@ -54,3 +54,10 @@ python urgent_prediction_gui.py
 You will need a file of exception hours and a file of productive hours for past years as training data. Also you will need a file of productive hours for the period you want to predict, which can be an estimation.
 
 ### Exception Classification Tool:
+
+The classification tool allows user to wrangle both `training data` and `exception data`, then use them to predict possible outcome for each exception. The predicted file would be called `classification_result.csv`. To use this tool, please enter the following into terminal or command prompt:
+```
+python src/Exception_Classification.py --raw_data_path="data/user_specified_training_data.csv" --exception_data_path="data/user_specified_exception_data.csv" --output_data_path="data"
+```
+
+You will need a file of histrical data of exceptions as training data, and also a file of exceptions waiting to be fulfilled. 
