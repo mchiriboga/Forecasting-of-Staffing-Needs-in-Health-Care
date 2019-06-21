@@ -11,7 +11,7 @@ Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
 
 ## Executive Summary
 
-For most positions in the healthcare business, any staff absences must always be filled in by another staff and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of healthcare institutions.
+For most positions in the health care business, any staff absences must always be filled in by another staff and the costs of substituting absences with short notice are usually significantly higher than regular staffing. Hence, preparing for potential shortages by predicting the short-term staffing needs can significantly improve the operational efficiency of health care institutions.
 
 The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions are made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time, vacation, maternity leave, etc.
 
@@ -31,9 +31,11 @@ In this project, we partnered with PHC to predict staff needs based in their his
 
 ### Exception Count Predictions
 
-To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. After further discussing about how to tackle this problem, we discovered that this was a problem in regards to time series data. Therefore, we concluded that there were several ways to solve this problem, for example, using regression, time series, or even neural networks. We attempted all of these methods on our validation set, and it turns out that fitting a time series model worked best for this problem. We then tried to fit different time series models using techniques and tools such as seasonal decomposition and Facebook’s open source tool called Prophet. Ultimately, we chose to move forward with the Prophet Facebook. Not only did the model provide the best results when comparing it with our validation set, it was also one of the easier models to implement on a large scale.
+To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. After further discussing about how to tackle this problem, we discovered that this was a problem in regards to time series data. Therefore, we concluded that there were several ways to solve this problem, for example, using regression, time series, or even neural networks. We attempted all of these methods on our validation set, and it turns out that fitting a time series model worked best for this problem. We then tried to fit different time series models using techniques and tools such as seasonal decomposition and Facebook’s open source tool called Prophet. Ultimately, we chose to move forward with the Prophet Facebook. Not only did the model provide the best results when comparing it with our validation set, it was also one of the more effective models to implement on a large scale.
 
 We want our forecast to be meaningful to PHC, which means that we wanted to provide accurate forecasts not just for the whole of PHC, but for the sub-categories belonging to PHC. Therefore, to do this, we split our data by SITE, JOB_FAMILY, and SUB_PROGRAM. As per our discussion with PHC, we chose to only focus our forecasts specifically on a subset of sites and job families. For SITE, we chose to focus only on the largest six health care facilities, which are: St Paul’s Hospital, Mt St Joseph, Holy Family, SVH Langara, Brock Fahrni, and Youville Residence. For JOB_FAMILY, we chose to focus only on nurses, but specifically the top 3 nurses: DC1000, DC2A00, DC2B00.
+
+Unfortunately, when we fit the time series models, we noticed that when the number of exceptions were very few in the training data, the predicted forecasts were not as accurate. We did not want to provide PHC with any information that might not be meaningful, so we thought of a method to fix this. Our solution was to only fit models that we were most confident in providing PHC. After digging through each model for every combination, we noticed that models that had at least 300 exceptions within the past 4 years of the prediction timeframe provided good results. Therefore, we set up this threshold and do not provide the predictions of combinations we know are going to be less accurate.
 
 To tune our models, we took a look at the Mean Absolute Error. The MAE provides a clear image for us to see how many exceptions we have predicted incorrectly averaged on a weekly basis. Overall, our MAE for our validation set and testing set were 118.42 and 131.57 respectively. This error is quite small in a sense that there are thousands of exceptions occurring each week. In terms of the errors for each facility, for the year 2018, we had the following MAEs:
 
@@ -52,15 +54,15 @@ To tune our models, we took a look at the Mean Absolute Error. The MAE provides 
 
 ### Urgent Exception Predictions
 
-Beside predicting the total count of exceptions, we also focus on the number of exceptions that are urgent. According to the strategies of backfilling the exceptions in PHC, "overtime" is the last solution to consider due to the high cost. If no backfill is available, the exception will be marked as "relief not found". These two kind of exceptions together is considered "urgent". We want to forecast approximately how many urgent exceptions will be, giving HR an insight so that they can make arrangement before hand to minimize loss.
+Besides predicting the total count of exceptions, we also focused on the number of exceptions that are urgent. According to the strategies of backfilling the exceptions in PHC, "Overtime" is the last solution to consider due to the high cost it brings. If no backfill is available, the exception will be marked as "Relief Not Found". These two types of exceptions is considered as "urgent". We want to forecast approximately how many urgent exceptions PHC will have, giving HR an insight so that they can make any arrangements beforehand to minimize costs.
 
-We use linear regression instead of time series for this part due to higher accuracy. We removed year 2014 from the training set, since the pattern is much different than the years after. Similarly, we also consider only the top three nurse groups, which are `DC1000`, `DC2A00` and `DC2B00` in `JOB_FAMILY` in the original data. As PHC mentioned that they are working on the system to switch shifts among different sites, we did not split by sites as in the overall forecasting.
+We used linear regression instead of time series for this part due to higher accuracy. We removed data from 2014 from the training set because the pattern is very different compared to the years after. Similarly, we also consider only the top three nurse groups, which are `DC1000`, `DC2A00` and `DC2B00` in `JOB_FAMILY` in the original data. As PHC mentioned that they are working on the system to switch shifts among different sites, we did not split by sites like in the previous portion.
 
-The predictors of the linear regression model are shift dates and productive hours. Shift dates are transformed into one-hot encoding, considering day of week, day of month, week of year and month of year. For the productive hours, even though we do not have exact data for the future period, we can use estimations according to shift arrangements. A graph of testing result for this model is shown below.
+The predictors of the linear regression model are shift dates and productive hours. Shift dates are transformed into one-hot encoding, considering day of week, day of month, week of year and month of year. For the productive hours, even though we do not have the exact data for the future periods, we can provide estimations according to shift arrangements. A graph of testing result for this model is shown below.
 
 <div align="center"><img src="img/urgent_1.png"></div>
 
-For some peaks in the daily basis, the linear model are not able to predict them accurately due to random events. The problem is more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, such as some new variables related to the operation for each hospital. But in general, the model has captured the general pattern sufficiently and made good predictions for most of the days. The Mean Absolute error for each group of 2018 is listed below.
+For some peaks in the daily basis, the linear model is not able to predict them accurately due to random events. The problem becomes more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, perhaps even new variables related to the operation for each hospital. But in general, the model has captured the general pattern sufficiently and made good predictions for the majority of the days. The Mean Absolute Error for each group of 2018 is listed below.
 
 <center>
 
@@ -75,20 +77,19 @@ For some peaks in the daily basis, the linear model are not able to predict them
 
 ### Exception Classification
 
-The classification model uses random forest classifiers to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have been created but yet been fulfilled, so the HR may change their priority to handling some exceptions to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, random forests performs best. And the interoperability is better than the other two, hence we agreed to choose random forest classifiers as our model.
+The classification model uses random forest classifiers to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have already been created but yet to be fulfilled, so the HR may change their priority to handle some exceptions and to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, we discovered that random forests had the best performance overall. Not only did it provide the best performance, it also fairs well against the other two methods in terms of interpretability.
 
-`EARNING_CATEGORY` is the label in our model, but it has 12 values which is too detailed for our prediction and hugely affects the model accuracy. Per partner’s advice, as long as the relief type (like straight time) is the same, we can treat them as the same. Hence, we group the 12 labels into 3 labels, which are:
+The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction, hence affecting the accuracy of the model. As per our partner’s advice, as long as the relief type (e.g. straight time) is the same, we can treat them as the same. Therefore, we grouped the 12 labels into the following 3 labels:
 
-- Straight Time: which contains all kinds of straight time relief, the pay rate is the same as the normal rate which is positive
+- Straight Time: which contains all sorts of straight time reliefs, the pay rate is the same as the normal rate which is positive
 
 - Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company.
 
 - Relief Not Needed, which is neutral to the company.
 
-We applied the forward selection method to implement feature selection. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(which is staff response time) to setup accuracy baseline, then added other features to see if it could increase model accuracy. After several tests, the following features are the rest of the features in our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
+For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
 
-
-We used validation set to test our model, the best result we have is listed below.
+The following table shows our validation accuracies.
 
 <center>
 
@@ -101,7 +102,7 @@ We used validation set to test our model, the best result we have is listed belo
 
 </center>
 
-As you can see, the overall accuracy is not bad. But if we break it down to every category, the difference is obvious. Since Overtime costs more than Straight time, we need to improve the accuracy of Overtime. The reason caused the gap between categories is imbalanced data. We found out that the number of straight time is way more than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. So we updated our model to make it more balanced.
+As you can see, the overall accuracy is pretty accurate. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. Because we see this problem, we updated the model to train based on a balanced set of data.
 
 <center>
 
@@ -113,7 +114,7 @@ As you can see, the overall accuracy is not bad. But if we break it down to ever
 
 </center>
 
-The comparison of our model accuracy. We can see that the accuracy of overtime and relief not needed has increased while losing some accuracy of Straight time. Since the Overtime is more critical to PHC, the sacrifice of straight time is acceptable, and our final test accuracy is listed in the right column.
+Below is the comparison of our model accuracies. We can see that the accuracy of Overtime and Relief Not Needed has increased, but the accuracy of Straight time has decreased. However, as we have mentioned, because Overtime is more critical to PHC, the sacrifice of Straight time's accuracy is acceptable, and our final test accuracy is listed in the right column.
 
 <center>
 
@@ -126,7 +127,7 @@ The comparison of our model accuracy. We can see that the accuracy of overtime a
 
 </center>
 
-This model’s output file is also a `.csv` file which adds two columns to the input data, one is the shift of exceptions per partner’s request. The other one is our prediction result.
+Similar to our other two products, this model’s output file is also a `.csv` file. However, we are adding two columns to the input data, one is the shift of exceptions, per partner’s request. The other is our prediction results for the `EARNING_CATEGORY`.
 
 #### Difficulties, Limitations, and Potential Improvements
 
@@ -134,16 +135,15 @@ Throughout the whole project, there were 2 main difficulties.
 
 The first one is that we had missing data. Due to technical reasons, some of our data (e.g. `MIN_TO_MAX_MINUTES`) was missing. We had to remove some records in order to maintain the quality of our training data, which affected the model accuracy.
 
-The second difficulty is feature selection. Though the current features performs quite well, if time allows, we will still want to improve it to the next level. We would focus on discovering new features to improve the accuracy. Perhaps we could even create our own features for better performance.
+The second difficulty is feature selection. Though the current features performs quite well, if time allows, we will still want to improve and bring it to the next level. We will focus on discovering new features to improve the accuracy. Perhaps we could even create our own features for better performance.
 
-During the presentation, we learned that using a LightBGM model might perform better than random forests, which is impressive. However, due to the time and resource limits, we were not able to attempt this model.
+After having heard the presentation from our program, we learned that using a LightBGM model might perform better than random forests, which is impressive. However, due to the time and resource limitations, we were not able to attempt this model.
 
 ## Data Product and Results
 
 ### Exception Count Predictions
 
 The Exception Count Prediction Tool is delivered through a script that generates a user interface that is easy to use. The interface can be run on both Windows computers and Mac computers, and it uses the same code to run. The interface has two parts, the top asks for the user to input the training data, which is the raw `exception_hours.csv` file that PHC has provided us. After including the correct type of data, the user will need to input a prediction timeframe. After clicking "Submit", our time series models will run and generate a `.csv` file that would provide all the relevant predictions regarding the number of exceptions Providence Health Care would have within the prediction timeframe.
-
 
 ### Dashboard
 
