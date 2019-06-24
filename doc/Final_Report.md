@@ -31,13 +31,19 @@ In this project, we partnered with PHC to predict staff needs based in their his
 
 ### Exception Count Predictions
 
-To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. After further discussing about how to tackle this problem, we discovered that this was a problem in regards to time series data. Therefore, we concluded that there were several ways to solve this problem, for example, using regression, time series, or even neural networks. We attempted all of these methods on our validation set, and it turns out that fitting a time series model worked best for this problem. We then tried to fit different time series models using techniques and tools such as seasonal decomposition and Facebook’s open source tool called Prophet. Ultimately, we chose to move forward with the Prophet Facebook. Not only did the model provide the best results when comparing it with our validation set, it was also one of the more effective models to implement on a large scale.
+To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. As all analysis should start, we performed some exploratory data analysis. First, we plotted out the number of exceptions.
 
-We want our forecast to be meaningful to PHC, which means that we wanted to provide accurate forecasts not just for the whole of PHC, but for the sub-categories belonging to PHC. Therefore, to do this, we split our data by SITE, JOB_FAMILY, and SUB_PROGRAM. As per our discussion with PHC, we chose to only focus our forecasts specifically on a subset of sites and job families. For SITE, we chose to focus only on the largest six health care facilities, which are: St Paul’s Hospital, Mt St Joseph, Holy Family, SVH Langara, Brock Fahrni, and Youville Residence. For JOB_FAMILY, we chose to focus only on nurses, but specifically the top 3 nurses: DC1000, DC2A00, DC2B00.
+<div align="center"><img src="img/exception_count_eda.png"></div>
 
-Unfortunately, when we fit the time series models, we noticed that when the number of exceptions were very few in the training data, the predicted forecasts were not as accurate. We did not want to provide PHC with any information that might not be meaningful, so we thought of a method to fix this. Our solution was to only fit models that we were most confident in providing PHC. After digging through each model for every combination, we noticed that models that had at least 300 exceptions within the past 4 years of the prediction timeframe provided good results. Therefore, we set up this threshold and do not provide the predictions of combinations we know are going to be less accurate.
+As you can see from the above EDA, we can see that there seems to be some sort of pattern to the number of exceptions throughout the years, so we explore it as a time series data. As you can see, we have decomposed the data into the trend and seasonality portions.
 
-To tune our models, we took a look at the Mean Absolute Error. The MAE provides a clear image for us to see how many exceptions we have predicted incorrectly averaged on a weekly basis. Overall, our MAE for our validation set and testing set were 118.42 and 131.57 respectively. This error is quite small in a sense that there are thousands of exceptions occurring each week. In terms of the errors for each facility, for the year 2018, we had the following MAEs:
+<div align="center"><img src="img/trend_seasonality.png"></div>
+
+Given the temporal nature of the data, we attempted to model this problem using regression, time series analysis, and even neural networks . We then tried to fit different time series models using techniques and tools such as seasonal decomposition and Facebook’s open source tool called Prophet. Ultimately, we chose to move forward with Facebook's Prophet tool. Not only did the model provide the best results when comparing it with our validation set, it was also one of the easier models to implement on a large scale.
+
+Because our goal is to provide PHC with more actionable predictions, providing a forecast of an aggregate exception count for the whole of PHC is not effective. For this reason we decided to group our models into specific combinations of SITE and JOB_FAMILY. However, several of these combinations have very little exceptions for our model to capture any meaning, Therefore, we chose to focus only on the largest six health care facilities, which are: St Paul’s Hospital, Mt St Joseph, Holy Family, SVH Langara, Brock Fahrni, and Youville Residence. In regards to JOB_FAMILY, we chose to focus only on nurses, but specifically the top 3 nurses: DC1000, DC2A00, DC2B00.
+
+To tune our models, we took a look at the Mean Absolute Error. The MAE provides a clear image for us to see how many exceptions we have predicted incorrectly averaged on a weekly basis. Overall, our MAE for our validation set and testing set were 118.42 and 131.57 respectively. Given that there are thousands of exceptions occurring each week, this MAE is fairly small and the predictions of the model can facilitate management to make better decisions in regards to staffing. In terms of the errors for each facility, for the year 2018, we had the following MAEs:
 
 <center>
 
@@ -51,6 +57,10 @@ To tune our models, we took a look at the Mean Absolute Error. The MAE provides 
 | SVH Langara | 12.42 |
 
 </center>
+
+The graph below is a visualization of the Actual Exception Count vs Predicted Exception Count as a whole for Providence Health Care:
+
+<div align="center"><img src="img/actual_vs_predicted.png"></div>
 
 ### Urgent Exception Predictions
 
