@@ -81,7 +81,7 @@ exception_hours %>%
 
 Finally, based on a Pareto chart displaying the different types of `NURS`, it was decided that the models should focus on the top 3 job families, which represent almost 96% of the total exceptions within this group.
 
-```{r Expand NURS LABOR_AGREEMENT}
+```{r Expand NURS LABOR_AGREEMENT, echo=FALSE, results='hide', fig.keep='all'}
 # NURS job families
 nurs_job_family <- exception_hours %>% 
   filter(LABOR_AGREEMENT == "NURS") %>%
@@ -102,11 +102,11 @@ pareto.chart(nurs_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pare
 
 To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. As all analysis should start, we performed some exploratory data analysis. First, we plotted out the number of exceptions.
 
-<div align="center"><img src="img/exception_count_eda.png"></div>
+![](img/exception_count_eda.png)
 
 As you can see from the above EDA, we can see that there seems to be some sort of pattern to the number of exceptions throughout the years, so we explore it as a time series data. As you can see, we have decomposed the data into the trend and seasonality portions.
 
-<div align="center"><img src="img/trend_seasonality.png"></div>
+![](img/trend_seasonality.png)
 
 Given the temporal nature of the data, we attempted to model this problem using regression, time series analysis, and even neural networks . We then tried to fit different time series models using techniques and tools such as seasonal decomposition and Facebook’s open source tool called Prophet. Ultimately, we chose to move forward with Facebook's Prophet tool. Not only did the model provide the best results when comparing it with our validation set, it was also one of the easier models to implement on a large scale.
 
@@ -139,7 +139,7 @@ We used linear regression instead of time series for this part due to higher acc
 
 The predictors of the linear regression model are shift dates and productive hours. Shift dates are transformed into one-hot encoding, considering day of week, day of month, week of year and month of year. For the productive hours, even though we do not have the exact data for the future periods, we can provide estimations according to shift arrangements. A graph of testing result for this model is shown below.
 
-<div align="center"><img src="img/urgent_1.png"></div>
+![](img/urgent_1.png)
 
 For some peaks in the daily basis, the linear model is not able to predict them accurately due to random events. The problem becomes more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, perhaps even new variables related to the operation for each hospital. But in general, the model has captured the general pattern sufficiently and made good predictions for the majority of the days. The Mean Absolute Error for each group of 2018 is listed below.
 
@@ -152,7 +152,6 @@ For some peaks in the daily basis, the linear model is not able to predict them 
 | DC2B00 | 2.19 |
 
 </center>
-
 
 ### Exception Classification
 
@@ -205,19 +204,20 @@ The top chart shows how many exceptions are being predicted in a weekly basis by
 
 The bottom chart displays how many urgent exceptions, which includes overtime and relief not found, are being predicted. The different bar colors correspond to different job families.
 
-<div align="center"><img src="img/dashboard_predictions.png"></div>
+![](img/dashboard_predictions.png)
 
 - Exceptions Classification
 
 The Exceptions Classification tab displays a summary table, where the user can easily see how many exceptions of each label is already on PHC's system. The user can filter by date and site.
 
-<div align="center"><img src="img/dashboard_classification.png"></div>
+![](img/dashboard_classification.png)
 
 - Productive vs. Exception Hours
 
 The Productive vs. Exception Hours tab displays a comparison between the productive and exception hours based on historical data. The user can filter by date, site, and job family.
 
-<div align="center"><img src="img/dashboard_history.png"></div>
+![](img/dashboard_history.png)
+
 
 ## Conclusions and Recommendations
 
