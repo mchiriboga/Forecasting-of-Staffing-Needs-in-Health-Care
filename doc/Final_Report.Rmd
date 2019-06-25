@@ -233,12 +233,22 @@ Finally, for the prediction models, we focused only on the top 3 nurse job famil
 
 ## Appendix
 
+- Exception Predictions
+
+Figure 3 uses a result dataframe that compares the actual number of exceptions to the predicted number of exceptions in 2018 on a weekly basis. To reproduce the dataframe, you need to specify the data for the exception hours in the `data folder, and then run the following command in the `src` folder:
+
+```
+python exception_prediction_result.py ../data/exception_hours.csv
+```
+
+The `exception_prediction_result.py` script uses the same method of prediction as in the user interface script `exception_prediction_gui.py`, but it adds the true value in order to make the comparison. The graph can be generated within Tableau using the output result dataframe. 
+
 - Urgent Exception Predictions
 
 Figure 4 uses a result dataframe comparing predicted and true number of urgent exceptions in 2018. To reproduce the dataframe, you need to have the data of exception hours and productive hours in the `data` folder, then run the following command in `src` folder:
 
 ```
-Python urgent_test_result.py ../data/exception_hours.csv ../data/productive_hours.csv
+python urgent_test_result.py ../data/exception_hours.csv ../data/productive_hours.csv
 ```
 
 The script `urgent_test_result.py` uses excactly the same method of prediction as in the user interface script `urgent_prediction_gui.py`, but adds the true data in order to make comparison. The graph can be generated in Tableau using the output result dataframe.
