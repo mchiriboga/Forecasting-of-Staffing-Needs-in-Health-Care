@@ -55,9 +55,10 @@ You will need a file of exception hours and a file of productive hours for past 
 
 ### Exception Classification Tool:
 
-The classification tool allows user to wrangle both `training data` and `exception data`, then use them to predict possible outcome for each exception. The predicted file would be called `classification_result.csv`. To use this tool, please enter the following into terminal or command prompt:
+The exception classification tool allows users to wrangle both `training data` and `exception data`, then use them to predict possible `EARNING_CATEGORY` for each exception. The predicted file would be called `classification_result.csv`. To use this tool, please enter the following into terminal or command prompt:
+
 ```
 python src/Exception_Classification.py --raw_data_path="data/user_specified_training_data.csv" --exception_data_path="data/user_specified_exception_data.csv" --output_data_path="data"
 ```
 
-You will need a file of histrical data of exceptions as training data, and also a file of exceptions waiting to be fulfilled. 
+You will need to specify the file containing historical data of exceptions for training data, and also the file of exceptions waiting to be fulfilled. 
