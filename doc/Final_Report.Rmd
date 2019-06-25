@@ -7,7 +7,9 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(qcc))
 ```
 
 ## Executive Summary
@@ -29,6 +31,72 @@ In this project, we partnered with PHC to predict staff needs based in their his
 - Classifying each exception logged on PHC's internal system in one of three possible categories, allowing PHC to prioritize which exceptions to pay extra attention to in finding relief for.
 
 ## Data Science Methods
+
+### EDA
+
+Before setting out to develop the prediction models, the first step in the project was to carry out an exploratory data analysis to have a better understanding of the dataset, which consisted of historical data of PHC's exception hours since the end of 2012.
+
+```{r load training data, include = FALSE}
+# Load the exception hours data
+exception_hours <- read_csv("../data/train.csv")
+```
+
+Exploring how the exceptions are distributed among the PHC facilities, it was clear that St. Paul’s Hospital is the main contributor, with about 5 times as many exceptions as the second one.
+
+```{r facilities rank}
+# Check the total number of exceptions by facilities
+(facilities <- exception_hours %>% 
+  group_by(SITE) %>% 
+  filter(SITE %in% c("Billable", "Brock Fahrni", "Holy Family",
+                     "Mt St Joseph", "PHC Corporate", "St John Hospice",
+                     "St Paul's Hospital", "SVH Honoria Conway", "SVH Langara",
+                     "Youville Residence")) %>%
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+ )
+```
+
+Performing a similar analysis to look at the distribution across the different labour agreements, faceting by facilities, it is evident that `NURS` are the group with the most exceptions.
+
+```{r number of exceptions by labor agreement}
+# Visualize the total number of exceptions by labor agreement facetting by site
+exception_hours %>%
+  filter(!(LABOR_AGREEMENT %in% c('NULL', '0')), SITE %in% c("Billable", "Brock Fahrni",
+                                                             "Holy Family", "Mt St Joseph",
+                                                             "PHC Corporate",
+                                                             "St John Hospice",
+                                                             "St Paul's Hospital",
+                                                             "SVH Honoria Conway",
+                                                             "SVH Langara", 
+                                                             "Youville Residence")) %>%
+  ggplot(aes(x = LABOR_AGREEMENT, fill = LABOR_AGREEMENT)) +
+  geom_bar(stat = "count") +
+  facet_wrap(~SITE) +
+  theme_bw() +
+  ggtitle("Number of Exceptions by Labor Agreement per Site (2013 - 2017)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 0.5, vjust = 0.5)) +
+  labs(x = "", y = "Count", fill = "")
+```
+
+Finally, based on a Pareto chart displaying the different types of `NURS`, it was decided that the models should focus on the top 3 job families, which represent almost 96% of the total exceptions within this group.
+
+```{r Expand NURS LABOR_AGREEMENT}
+# NURS job families
+nurs_job_family <- exception_hours %>% 
+  filter(LABOR_AGREEMENT == "NURS") %>%
+  group_by(JOB_FAMILY_DESCRIPTION) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  mutate(cumsum = cumsum(count),
+        freq = round(count / sum(count), 3),
+        cum_freq = cumsum(freq))
+
+# Plot pareto
+nurs_job_family_count <- nurs_job_family$count
+names(nurs_job_family_count) <- nurs_job_family$`JOB_FAMILY_DESCRIPTION`
+pareto.chart(nurs_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pareto chart for NURS job families")
+```
 
 ### Exception Count Predictions
 
@@ -88,9 +156,9 @@ For some peaks in the daily basis, the linear model is not able to predict them 
 
 ### Exception Classification
 
-The classification model uses random forest classifiers to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have already been created but yet to be fulfilled, so the HR may change their priority to handle some exceptions and to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, we discovered that random forests had the best performance overall. Not only did it provide the best performance, it also fairs well against the other two methods in terms of interpretability.
+The PHC can prepare some relief ahead based on the first two models' results. But for the exceptions which have already been created in the system, we can also generate some insights to help HR arrange their priority to handle some exceptions and to avoid unnecessary cost. Hence, we developed this classification model uses random forest classifiers to predict the possible outcome for an exception.
 
-The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction, hence affecting the accuracy of the model. As per our partner’s advice, as long as the relief type (e.g. straight time) is the same, we can treat them as the same. Therefore, we grouped the 12 labels into the following 3 labels:
+The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction.  Therefore, we grouped the 12 labels into the following 3 labels:
 
 - Straight Time: which contains all sorts of straight time reliefs, the pay rate is the same as the normal rate which is positive
 
@@ -98,32 +166,9 @@ The label for our classification model is `EARNING_CATEGORY`, but it has 12 valu
 
 - Relief Not Needed, which is neutral to the company.
 
-For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
+For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTICE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
 
-The following table shows our validation accuracies.
-
-<center>
-
-| |Accuracy|
-|--------------------|:-------:|
-| Validation | 0.841 |
-| Straight Time | 0.936 |
-| Overtime and Beyond| 0.638 |
-| Relief Not Needed| 0.308 |
-
-</center>
-
-As you can see, the overall accuracy is pretty accurate. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. Because we see this problem, we updated the model to train based on a balanced set of data.
-
-<center>
-
-|  | Amount |
-|--------------------|:-------:|
-| Straight Time | 262,608 |
-| Overtime and Beyond| 76,863 |
-| Relief Not Needed| 11,806 |
-
-</center>
+After validation, the model's overall accuracy is accpetable. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two, and we updated the model to train based on a balanced set of data.
 
 Below is the comparison of our model accuracies. We can see that the accuracy of Overtime and Relief Not Needed has increased, but the accuracy of Straight time has decreased. However, as we have mentioned, because Overtime is more critical to PHC, the sacrifice of Straight time's accuracy is acceptable, and our final test accuracy is listed in the right column.
 
@@ -137,18 +182,6 @@ Below is the comparison of our model accuracies. We can see that the accuracy of
 | Relief Not Needed| 0.308 | 0.625 | 0.633 |
 
 </center>
-
-Similar to our other two products, this model’s output file is also a `.csv` file. However, we are adding two columns to the input data, one is the shift of exceptions, per partner’s request. The other is our prediction results for the `EARNING_CATEGORY`.
-
-#### Difficulties, Limitations, and Potential Improvements
-
-Throughout the whole project, there were 2 main difficulties.
-
-The first one is that we had missing data. Due to technical reasons, some of our data (e.g. `MIN_TO_MAX_MINUTES`) was missing. We had to remove some records in order to maintain the quality of our training data, which affected the model accuracy.
-
-The second difficulty is feature selection. Though the current features performs quite well, if time allows, we will still want to improve and bring it to the next level. We will focus on discovering new features to improve the accuracy. Perhaps we could even create our own features for better performance.
-
-After having heard the presentation from our program, we learned that using a LightBGM model might perform better than random forests, which is impressive. However, due to the time and resource limitations, we were not able to attempt this model.
 
 ## Data Product and Results
 
@@ -188,9 +221,9 @@ This tab displays a comparison between the productive and exception hours based 
 
 ## Conclusions and Recommendations
 
-Using the three data products we have developed, we are able to provide Providence Health Care with the insights they need to be able to answer the question that was posed at the start of the project: _"How should PHC prepare for their weekly staffing needs in order to effectively operate with a full staff?"_. Not only the data products provide accurate classifications and forecasts of PHC's exceptions, they can also help plan for the short-term and long-term staffing needs. However, it should be noted that we recommend using each of the tools separately.
+Using the three data products developed, we are able to provide Providence Health Care with the insights they need to answer the question that was posed at the start of the project: _"How should PHC prepare for their weekly staffing needs in order to effectively operate with a full staff?"_. Not only the data products provide accurate classifications and forecasts of PHC's exceptions, they can also help plan for the short-term and long-term staffing needs. However, it's important to note that the models are independent and the frequency with which they should be updated will depend on how PHC will use each of them.
 
-In regards to the Exception Count and the Urgent Exception Predictions, because our forecasts will stay relevant for quite a while, it is not necessary for PHC to re-train the models every day or even every week. In fact, we recommend that PHC re-train the models once every month with updated data, which will definitely increase the efficiency for PHC.
+In regards to the Exception Count and the Urgent Exception Predictions, the forecasts can remain accurate for an extended period without re-training (approximately 6 months). So, it is not necessary for PHC to re-train the models every day or even every week; but, there's an accuracy gain to be had by periodically re-training the model, adding more recent data. Thus, we recommend that PHC re-train the models once every month.
 
 As to the Exception Classification, the model was trained on all exceptions logged in PHC's internal systems. The model does not require periodic re-training to stay accurate, but it's important to run the classifier for newly logged exceptions to obtain their respective classifications. The frequency should be determined by PHC based on their needs, but it'll likely need to be more than once a month.
 
