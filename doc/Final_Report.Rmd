@@ -235,7 +235,7 @@ Finally, for the prediction models, we focused only on the top 3 nurse job famil
 
 - Exception Predictions
 
-Figure 3 uses a result dataframe that compares the actual number of exceptions to the predicted number of exceptions in 2018 on a weekly basis. To reproduce the dataframe, you need to specify the data for the exception hours in the `data folder, and then run the following command in the `src` folder:
+The graph comparing the actual and predicted exception counts in our report uses a result `.csv` that contains both the actual and predicted number of exceptions of 2018 on a weekly basis. To reproduce the dataframe, you need to specify the data for the exception hours in the `data folder, and then run the following command in the `src` folder:
 
 ```
 python exception_prediction_result.py ../data/exception_hours.csv
@@ -245,7 +245,7 @@ The `exception_prediction_result.py` script uses the same method of prediction a
 
 - Urgent Exception Predictions
 
-Figure 4 uses a result dataframe comparing predicted and true number of urgent exceptions in 2018. To reproduce the dataframe, you need to have the data of exception hours and productive hours in the `data` folder, then run the following command in `src` folder:
+The graph comparing the actual and predicted urgent exception counts in our report uses a result `.csv` containing the predicted and true number of urgent exceptions in 2018. To reproduce the dataframe, you need to have the data of exception hours and productive hours in the `data` folder, then run the following command in `src` folder:
 
 ```
 python urgent_test_result.py ../data/exception_hours.csv ../data/productive_hours.csv
