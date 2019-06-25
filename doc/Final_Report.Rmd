@@ -7,7 +7,9 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(qcc))
 ```
 
 ## Executive Summary
@@ -32,7 +34,69 @@ In this project, we partnered with PHC to predict staff needs based in their his
 
 ### EDA
 
+Before setting out to develop the prediction models, the first step in the project was to carry out an exploratory data analysis to have a better understanding of the dataset, which consisted of historical data of PHC's exception hours since the end of 2012.
 
+```{r load training data, include = FALSE}
+# Load the exception hours data
+exception_hours <- read_csv("../data/train.csv")
+```
+
+Exploring how the exceptions are distributed among the PHC facilities, it was clear that St. Paul’s Hospital is the main contributor, with about 5 times as many exceptions as the second one.
+
+```{r facilities rank}
+# Check the total number of exceptions by facilities
+(facilities <- exception_hours %>% 
+  group_by(SITE) %>% 
+  filter(SITE %in% c("Billable", "Brock Fahrni", "Holy Family",
+                     "Mt St Joseph", "PHC Corporate", "St John Hospice",
+                     "St Paul's Hospital", "SVH Honoria Conway", "SVH Langara",
+                     "Youville Residence")) %>%
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+ )
+```
+
+Performing a similar analysis to look at the distribution across the different labour agreements, faceting by facilities, it is evident that `NURS` are the group with the most exceptions.
+
+```{r number of exceptions by labor agreement}
+# Visualize the total number of exceptions by labor agreement facetting by site
+exception_hours %>%
+  filter(!(LABOR_AGREEMENT %in% c('NULL', '0')), SITE %in% c("Billable", "Brock Fahrni",
+                                                             "Holy Family", "Mt St Joseph",
+                                                             "PHC Corporate",
+                                                             "St John Hospice",
+                                                             "St Paul's Hospital",
+                                                             "SVH Honoria Conway",
+                                                             "SVH Langara", 
+                                                             "Youville Residence")) %>%
+  ggplot(aes(x = LABOR_AGREEMENT, fill = LABOR_AGREEMENT)) +
+  geom_bar(stat = "count") +
+  facet_wrap(~SITE) +
+  theme_bw() +
+  ggtitle("Number of Exceptions by Labor Agreement per Site (2013 - 2017)") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 0.5, vjust = 0.5)) +
+  labs(x = "", y = "Count", fill = "")
+```
+
+Finally, based on a Pareto chart displaying the different types of `NURS`, it was decided that the models should focus on the top 3 job families, which represent almost 96% of the total exceptions within this group.
+
+```{r Expand NURS LABOR_AGREEMENT}
+# NURS job families
+nurs_job_family <- exception_hours %>% 
+  filter(LABOR_AGREEMENT == "NURS") %>%
+  group_by(JOB_FAMILY_DESCRIPTION) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  mutate(cumsum = cumsum(count),
+        freq = round(count / sum(count), 3),
+        cum_freq = cumsum(freq))
+
+# Plot pareto
+nurs_job_family_count <- nurs_job_family$count
+names(nurs_job_family_count) <- nurs_job_family$`JOB_FAMILY_DESCRIPTION`
+pareto.chart(nurs_job_family_count, cumperc = seq(0, 100, by = 25), main = "Pareto chart for NURS job families")
+```
 
 ### Exception Count Predictions
 
