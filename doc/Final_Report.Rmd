@@ -199,7 +199,7 @@ We implemented the dashboard using Tableau, where we consolidated the three mode
 
 - Predictions
 
-This tab displays two charts stacked vertically.
+The Predictions tab displays two charts stacked vertically.
 
 The top chart shows how many exceptions are being predicted in a weekly basis by different sites, job families, and sub-program. The orange series corresponds to the predicted numbers of exceptions, while the grey ones represent the 95% confidence interval.
 
@@ -209,19 +209,19 @@ The bottom chart displays how many urgent exceptions, which includes overtime an
 
 - Exceptions Classification
 
-This tab displays a summary table, where the user can easily see how many exceptions of each label is already on PHC's system. The user can filter by date and site.
+The Exceptions Classification tab displays a summary table, where the user can easily see how many exceptions of each label is already on PHC's system. The user can filter by date and site.
 
 <div align="center"><img src="img/dashboard_classification.png"></div>
 
 - Productive vs. Exception Hours
 
-This tab displays a comparison between the productive and exception hours based on historical data. The user can filter by date, site, and job family.
+The Productive vs. Exception Hours tab displays a comparison between the productive and exception hours based on historical data. The user can filter by date, site, and job family.
 
 <div align="center"><img src="img/dashboard_history.png"></div>
 
 ## Conclusions and Recommendations
 
-Using the three data products developed, we are able to provide Providence Health Care with the insights they need to answer the question that was posed at the start of the project: _"How should PHC prepare for their weekly staffing needs in order to effectively operate with a full staff?"_. Not only the data products provide accurate classifications and forecasts of PHC's exceptions, they can also help plan for the short-term and long-term staffing needs. However, it's important to note that the models are independent and the frequency with which they should be updated will depend on how PHC will use each of them.
+Using the three data products developed, we are able to provide Providence Health Care with the insights they need to answer the question that was posed at the start of the project: _"How should PHC prepare for their weekly staffing needs in order to effectively operate with a full staff?"_. Not only the data products provide classifications and forecasts of PHC's exceptions, they can also help plan for the short-term and long-term staffing needs. However, it's important to note that the models are independent and the frequency with which they should be updated will depend on how PHC will use each of them.
 
 In regards to the Exception Count and the Urgent Exception Predictions, the forecasts can remain accurate for an extended period without re-training (approximately 6 months). So, it is not necessary for PHC to re-train the models every day or even every week; but, there's an accuracy gain to be had by periodically re-training the model, adding more recent data. Thus, we recommend that PHC re-train the models once every month.
 
