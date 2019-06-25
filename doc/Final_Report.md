@@ -64,15 +64,17 @@ The graph below is a visualization of the Actual Exception Count vs Predicted Ex
 
 ### Urgent Exception Predictions
 
-Besides predicting the total count of exceptions, we also focused on the number of exceptions that are urgent. According to the strategies of backfilling the exceptions in PHC, "Overtime" is the last solution to consider due to the high cost it brings. If no backfill is available, the exception will be marked as "Relief Not Found". These two types of exceptions is considered as "urgent". We want to forecast approximately how many urgent exceptions PHC will have, giving HR an insight so that they can make any arrangements beforehand to minimize costs.
+Besides predicting the total count of exceptions, we also focused on the number of urgent exceptions, which are backfilled by "overtime" and "relief not found". According to the backfilling strategies in PHC, "overtime" is the last solution to consider due to the high cost it brings. If no backfill is available, the exception will be marked as "relief not found". We want to forecast approximately how many urgent exceptions PHC will have, giving HR an insight so that they can make any arrangements beforehand to minimize costs.
 
-We used linear regression instead of time series for this part due to higher accuracy. We removed data from 2014 from the training set because the pattern is very different compared to the years after. Similarly, we also consider only the top three nurse groups, which are `DC1000`, `DC2A00` and `DC2B00` in `JOB_FAMILY` in the original data. As PHC mentioned that they are working on the system to switch shifts among different sites, we did not split by sites like in the previous portion.
+We used linear regression instead of time series for this part due to higher accuracy. We removed data from 2014 from the training set because the pattern is very different compared to the years after. Similarly, we also consider only the top three nurse groups, which are `DC1000`, `DC2A00` and `DC2B00` in `JOB_FAMILY` in the original data. We did not split by sites as in the previous section for two reasons. First of all, most sites only have a small number of exceptions and the urgent exception count are even smaller, the predictions would be much less accurate and not meaningful for user. Secondly, as PHC mentioned that they are working on the system to switch shifts among different sites, they prefer to receive a general overview that consider all sites as a whole. Thus, we provide the total count prediction for all sites.
+
+the As PHC mentioned that they are working on the system to switch shifts among different sites, we did not split by sites like in the previous portion.
 
 The predictors of the linear regression model are shift dates and productive hours. Shift dates are transformed into one-hot encoding, considering day of week, day of month, week of year and month of year. For the productive hours, even though we do not have the exact data for the future periods, we can provide estimations according to shift arrangements. A graph of testing result for this model is shown below.
 
 <div align="center"><img src="img/urgent_1.png"></div>
 
-For some peaks in the daily basis, the linear model is not able to predict them accurately due to random events. The problem becomes more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, perhaps even new variables related to the operation for each hospital. But in general, the model has captured the general pattern sufficiently and made good predictions for the majority of the days. The Mean Absolute Error for each group of 2018 is listed below.
+For some peaks in the daily basis, the linear model is not able to predict them accurately due to random events. The problem becomes more obvious in the groups with smaller counts like `DC2B00`. We expect that the model can be improved by providing more features, perhaps even new variables related to the operation for each hospital. However, the model provides satisfiable predictions in general. The Mean Absolute Error for each group of 2018 is listed below.
 
 <center>
 
@@ -87,7 +89,7 @@ For some peaks in the daily basis, the linear model is not able to predict them 
 
 ### Exception Classification
 
-The PHC can prepare some relief ahead based on the first two models' results. But for the exceptions which have already been created in the system, we can also generate some insights to help HR arrange their priority to handle some exceptions and to avoid unnecessary cost. Hence, we developed this classification model uses random forest classifiers to predict the possible outcome for an exception. 
+The PHC can prepare some relief ahead based on the first two models' results. But for the exceptions which have already been created in the system, we can also generate some insights to help HR arrange their priority to handle some exceptions and to avoid unnecessary cost. Hence, we developed this classification model uses random forest classifiers to predict the possible outcome for an exception.
 
 The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction.  Therefore, we grouped the 12 labels into the following 3 labels:
 
