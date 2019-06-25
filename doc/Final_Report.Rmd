@@ -30,6 +30,10 @@ In this project, we partnered with PHC to predict staff needs based in their his
 
 ## Data Science Methods
 
+### EDA
+
+
+
 ### Exception Count Predictions
 
 To begin with the predictions of exception count, because we had to make sure that we did not overfit our model when training, we first split our data into three separate portions: training, validation, and testing. The training dataset consisted of data from 2013 to 2016. 2017 and 2018 were the datasets for validation and testing respectively. As all analysis should start, we performed some exploratory data analysis. First, we plotted out the number of exceptions.
@@ -88,9 +92,9 @@ For some peaks in the daily basis, the linear model is not able to predict them 
 
 ### Exception Classification
 
-The classification model uses random forest classifiers to predict the possible outcome for an exception. We are aiming to generate insights for exceptions which have already been created but yet to be fulfilled, so the HR may change their priority to handle some exceptions and to avoid unnecessary cost. After applying logistic regression, random forests, and gradient boosting, we discovered that random forests had the best performance overall. Not only did it provide the best performance, it also fairs well against the other two methods in terms of interpretability.
+The PHC can prepare some relief ahead based on the first two models' results. But for the exceptions which have already been created in the system, we can also generate some insights to help HR arrange their priority to handle some exceptions and to avoid unnecessary cost. Hence, we developed this classification model uses random forest classifiers to predict the possible outcome for an exception.
 
-The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction, hence affecting the accuracy of the model. As per our partner’s advice, as long as the relief type (e.g. straight time) is the same, we can treat them as the same. Therefore, we grouped the 12 labels into the following 3 labels:
+The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction.  Therefore, we grouped the 12 labels into the following 3 labels:
 
 - Straight Time: which contains all sorts of straight time reliefs, the pay rate is the same as the normal rate which is positive
 
@@ -98,32 +102,9 @@ The label for our classification model is `EARNING_CATEGORY`, but it has 12 valu
 
 - Relief Not Needed, which is neutral to the company.
 
-For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTCIE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
+For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTICE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
 
-The following table shows our validation accuracies.
-
-<center>
-
-| |Accuracy|
-|--------------------|:-------:|
-| Validation | 0.841 |
-| Straight Time | 0.936 |
-| Overtime and Beyond| 0.638 |
-| Relief Not Needed| 0.308 |
-
-</center>
-
-As you can see, the overall accuracy is pretty accurate. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two. Which makes sense that the model is more likely to predict an exception as straight time instead of the other two. Because we see this problem, we updated the model to train based on a balanced set of data.
-
-<center>
-
-|  | Amount |
-|--------------------|:-------:|
-| Straight Time | 262,608 |
-| Overtime and Beyond| 76,863 |
-| Relief Not Needed| 11,806 |
-
-</center>
+After validation, the model's overall accuracy is accpetable. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two, and we updated the model to train based on a balanced set of data.
 
 Below is the comparison of our model accuracies. We can see that the accuracy of Overtime and Relief Not Needed has increased, but the accuracy of Straight time has decreased. However, as we have mentioned, because Overtime is more critical to PHC, the sacrifice of Straight time's accuracy is acceptable, and our final test accuracy is listed in the right column.
 
@@ -137,18 +118,6 @@ Below is the comparison of our model accuracies. We can see that the accuracy of
 | Relief Not Needed| 0.308 | 0.625 | 0.633 |
 
 </center>
-
-Similar to our other two products, this model’s output file is also a `.csv` file. However, we are adding two columns to the input data, one is the shift of exceptions, per partner’s request. The other is our prediction results for the `EARNING_CATEGORY`.
-
-#### Difficulties, Limitations, and Potential Improvements
-
-Throughout the whole project, there were 2 main difficulties.
-
-The first one is that we had missing data. Due to technical reasons, some of our data (e.g. `MIN_TO_MAX_MINUTES`) was missing. We had to remove some records in order to maintain the quality of our training data, which affected the model accuracy.
-
-The second difficulty is feature selection. Though the current features performs quite well, if time allows, we will still want to improve and bring it to the next level. We will focus on discovering new features to improve the accuracy. Perhaps we could even create our own features for better performance.
-
-After having heard the presentation from our program, we learned that using a LightBGM model might perform better than random forests, which is impressive. However, due to the time and resource limitations, we were not able to attempt this model.
 
 ## Data Product and Results
 
