@@ -1,21 +1,22 @@
-# DSCI_591_capstone-Providence
+# Forecasting of Staffing Needs in Health Care
 
-Forecasting of Staffing Needs
-
-### Contributors:
+## Contributors:
 
 - [Luo (Iris) Yang](https://github.com/lyiris22)
 - [Marcelle Chiriboga](https://github.com/mchiriboga)
 - [Patrick Tung](https://github.com/tungpatrick)
 - [Weifeng (Davy) Guo](https://github.com/DavyGuo)
 
-### Milestones:
+## Summary
+
+The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions are made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time, vacation, maternity leave, etc. Specifically, the data product developed has four components - three predictive models and a dashboard.
+
+## Milestones:
  |Deliverable|Link|
  |---|---|
  |Proposal Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/1.Proposal_Presentation.ipynb)|
  ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/2.Proposal_Presentation.pdf)|
- | Proposal Report |[.md](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/3.Proposal_Report.md))|
- ||[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/4.Proposal_Report.pdf)|
+ | Proposal Report |[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/4.Proposal_Report.pdf)|
  |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/5.Final_Presentation_slides.ipynb)|
  ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/6.Final_Presentation.pdf)|
  |Final Report|[.Rmd](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/7.Final_Report.Rmd)|
