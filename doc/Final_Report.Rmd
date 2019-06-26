@@ -251,4 +251,4 @@ The graph comparing the actual and predicted urgent exception counts in our repo
 python urgent_test_result.py ../data/exception_hours.csv ../data/productive_hours.csv
 ```
 
-The script `urgent_test_result.py` uses excactly the same method of prediction as in the user interface script `urgent_prediction_gui.py`, but adds the true data in order to make comparison. The graph can be generated in Tableau using the output result dataframe.
+The script `urgent_test_result.py` uses exactly the same method of prediction as in the user interface script `urgent_prediction_gui.py`, but adds the true data in order to make comparison. The graph can be generated in Tableau using the output result dataframe.
