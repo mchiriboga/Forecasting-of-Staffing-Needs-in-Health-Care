@@ -88,7 +88,7 @@ def main():
     output = output[['yhat', 'y', 'ds', 'job_family']]
 
     # save result file
-    output.to_csv("../data/predictions/urgent_test.csv")
+    output.to_csv("../data/predictions/urgent_exception_predictions.csv")
 
 
 def day_X(df, productive, enc = OneHotEncoder(handle_unknown='ignore', sparse = False), method = "train"):
