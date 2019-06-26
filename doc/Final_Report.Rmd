@@ -249,4 +249,14 @@ The graph comparing the actual and predicted urgent exception counts in our repo
 python urgent_test_result.py ../data/exception_hours.csv ../data/productive_hours.csv
 ```
 
-The script `urgent_test_result.py` uses exactly the same method of prediction as in the user interface script `urgent_prediction_gui.py`, but adds the true data in order to make comparison. The graph can be generated in Tableau using the output result dataframe.
+The script `urgent_test_result.py` uses the same method of prediction as in the user interface script `urgent_prediction_gui.py`, but adds the true data in order to make comparison. The graph can be generated in Tableau using the output result dataframe.
+
+- Exception Classification
+
+The dataframe containing test result that is shown in Tableau contains the predicted values of test data in 2018. To reproduce the dataframe, you need to have the data of exception hours in the `data` folder, then run the following command in `src` folder:
+
+```
+python classification_test_result.py ../data/exception_hours.csv
+```
+
+The script `classification_test_result.py` uses the same method of prediction as in the original script `Exception_Classification.py`, but uses year 2018 as test data.
