@@ -155,21 +155,19 @@ For some peaks in the daily basis, the linear model is not able to predict them 
 
 ### Exception Classification
 
-The PHC can prepare some relief ahead based on the first two models' results. But for the exceptions which have already been created in the system, we can also generate some insights to help HR arrange their priority to handle some exceptions and to avoid unnecessary cost. Hence, we developed this classification model uses random forest classifiers to predict the possible outcome for an exception.
+The two predictive models can help PHC plan relief ahead, but for the exceptions which have already been recorded in their internal systems, we can also generate some insights to help HR prioritize how to handle the exceptions, avoiding unnecessary costs. Hence, we developed a classification model which uses random forest classifiers to predict the most likely outcome for a given exception.
 
-The label for our classification model is `EARNING_CATEGORY`, but it has 12 values and is too detailed for our prediction.  Therefore, we grouped the 12 labels into the following 3 labels:
+Our classification model outputs categories corresponding to the `EARNING_CATEGORY` variable. Originally, there were 12 possible categories, which were grouped into the following 3 labels:
 
-- Straight Time: which contains all sorts of straight time reliefs, the pay rate is the same as the normal rate which is positive
+- *Straight Time:* which contains all sorts of straight time reliefs. For this category, the pay rate is the same as the normal rate, so finding relief for these exceptions doesn't incur extra costs. Exceptions with `EARNING_CATEGORY` matching the following values were grouped into this label: `Regular Relief Utilized`, `Casual at Straight-Time`, `PT Over FTE`, `Miscellaneous Straight-Time`, `PT Employee Moved - Straight-Time`, `FT Employee Moved - Straight-Time`.
 
-- Overtime and Beyond: which contains `Relief Not Found` and all kinds of relief which needs to be paid more than normal rate, which is negative to the company.
+- *Overtime and Beyond:* which contains `Relief Not Found` and all kinds of relief which need to be paid more than the normal rate, which results in extra costs and thus should be avoided. Exceptions with `EARNING_CATEGORY` matching the following values were grouped into this label: `Overtime`, `Agency`, `Insufficient Notice`, `On-Call`, `Relief Not Found`.
 
-- Relief Not Needed, which is neutral to the company.
+- *Relief Not Needed*: which contains exceptions that don't need relief. Only exceptions with `EARNING_CATEGORY` matching `Relief Not Needed` are mapped to this label. 
 
-For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTICE`(i.e. staff response time) to setup accuracy baseline, then we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`,  `SUB_PROGRAM`,  `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`,  `SHIFT`.
+For feature selection, we applied the forward selection method. We used `EXCEPTION_HOURS`, `EXCEPTION_CREATION_TO_SHIFTSTART_MINUTES`, `NOTICE` (i.e. staff response time) to set up the accuracy baseline for the model. Then, we added other features to see if it could increase the model accuracy. After several rounds of selection, we ended up adding the following features to our model: `SITE`, `PROGRAM`, `SUB_PROGRAM`, `EXCEPTION_GROUP`, `MONTH`, `DEPARTMENT`, and `SHIFT`.
 
-After validation, the model's overall accuracy is accpetable. However, if we break it down to every category, the difference is obvious. As we have mentioned Overtime costs more than Straight time, so it is more harmful for PHC to have Overtimes compared to Straight times. Therefore, we need to improve the accuracy of Overtime. The reason for the large discrepancy between the categories is imbalanced data. We found that the number of Straight time entries is much higher than the other two, and we updated the model to train based on a balanced set of data.
-
-Below is the comparison of our model accuracies. We can see that the accuracy of Overtime and Relief Not Needed has increased, but the accuracy of Straight time has decreased. However, as we have mentioned, because Overtime is more critical to PHC, the sacrifice of Straight time's accuracy is acceptable, and our final test accuracy is listed in the right column.
+After evaluating the model against the validation set, we found that even though the overall accuracy was 0.841, the accuracy for `Straight Time` category was much higher than the other two. This is due to the fact that the the data was imbalanced, with the training set containing many more examples that fall into the `Straight Time` category - almost 3x as much as the other two combined. Since exceptions that fall under the `Overtime and Beyond` category are the ones with the most impact to the business, it's important that the model predict those with higher accuracy. Thus, we updated our model's training to account for the imbalance, which in the end resulted in accuracies that are slightly lower overall, but which are more higher for the most critical categories, as seen in the table below.
 
 <center>
 
