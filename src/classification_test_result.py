@@ -58,7 +58,7 @@ def main():
 
     # export output
     output = output.reset_index()
-    output.to_csv("../data/predictions/test_classification_result.csv", header=True)
+    output.to_csv("../data/predictions/classification_result.csv", header=True)
 
 
 def training_wrangling(dataframe):
