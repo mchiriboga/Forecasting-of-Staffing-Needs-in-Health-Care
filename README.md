@@ -2,12 +2,18 @@
 
 ## Contributors:
 
+Team Members:
 - [Marcelle Chiriboga](https://github.com/mchiriboga)
 - [Weifeng (Davy) Guo](https://github.com/DavyGuo)
 - [Patrick Tung](https://github.com/tungpatrick)
 - [Luo (Iris) Yang](https://github.com/lyiris22)
 
-## Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+Mentor:
+- [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+
+Partner:
+
+- Providence Health Care
 
 
 ## Summary
