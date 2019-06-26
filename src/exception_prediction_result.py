@@ -191,7 +191,7 @@ def main():
     total_data = pd.DataFrame()
     for i in weekly:
         total_data = pd.concat([total_data, weekly[i]], axis=0)
-    total_data.to_csv(predictions_path + "exception_prediction_test.csv")
+    total_data.to_csv(predictions_path + "exception_predictions.csv")
 
 # call main function
 if __name__ == "__main__":
