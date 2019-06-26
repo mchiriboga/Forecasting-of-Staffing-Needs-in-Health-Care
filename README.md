@@ -61,4 +61,8 @@ The exception classification tool allows users to wrangle both `training data` a
 python src/Exception_Classification.py --raw_data_path="data/user_specified_training_data.csv" --exception_data_path="data/user_specified_exception_data.csv" --output_data_path="data"
 ```
 
-You will need to specify the file containing historical data of exceptions for training data, and also the file of exceptions waiting to be fulfilled. 
+You will need to specify the file containing historical data of exceptions for training data, and also the file of exceptions waiting to be fulfilled.
+
+### Dashboard
+
+Tableau doesn’t support relative paths, meaning every data source connection in a .twb file points to an absolute path. So after cloning or forking the repo, the users will need to update the data source connections in their local machine when they first open the dashboard, ensuring the data source paths point to the correct files on their computer. For that, follow the instructions described [here](https://onlinehelp.tableau.com/current/pro/desktop/en-us/connect_basic_replace.htm).
