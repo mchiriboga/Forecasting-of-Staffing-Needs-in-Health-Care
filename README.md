@@ -2,10 +2,13 @@
 
 ## Contributors:
 
-- [Luo (Iris) Yang](https://github.com/lyiris22)
 - [Marcelle Chiriboga](https://github.com/mchiriboga)
-- [Patrick Tung](https://github.com/tungpatrick)
 - [Weifeng (Davy) Guo](https://github.com/DavyGuo)
+- [Patrick Tung](https://github.com/tungpatrick)
+- [Luo (Iris) Yang](https://github.com/lyiris22)
+
+## Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+
 
 ## Summary
 
@@ -69,6 +72,12 @@ You will need to specify the file containing historical data of exceptions for t
 
 ### Dashboard
 
-The dashboard can be found [here](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/src/phc_dashboard.twb).
+The dashboard was developed using Tableau, consolidating the three models.
+
+![](imgs/dashboard_predictions.png)
+
+![](imgs/dashboard_classification.png)
+
+The dashboard .twb file can be found [here](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/src/phc_dashboard.twb) and uses as input the .csv outputs from the three models mentioned above, stored on [src/](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/tree/master/src).
 
 Tableau doesn’t support relative paths, meaning every data source connection in a .twb file points to an absolute path. So after cloning or forking the repo, the users will need to update the data source connections in their local machine when they first open the dashboard, ensuring the data source paths point to the correct files on their computer. For that, follow the instructions described [here](https://onlinehelp.tableau.com/current/pro/desktop/en-us/connect_basic_replace.htm).
