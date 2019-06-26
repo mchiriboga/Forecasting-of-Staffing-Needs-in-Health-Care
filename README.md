@@ -2,15 +2,23 @@
 
 ## Contributors:
 
+Team Members:
 - [Marcelle Chiriboga](https://github.com/mchiriboga)
 - [Weifeng (Davy) Guo](https://github.com/DavyGuo)
 - [Patrick Tung](https://github.com/tungpatrick)
 - [Luo (Iris) Yang](https://github.com/lyiris22)
 
-## Mentor: [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+Mentor:
+- [Rodolfo Lourenzutti](https://github.com/Lourenzutti)
+
+Partner:
+
+- Providence Health Care
 
 
 ## Summary
+
+<img align="right" width="100" src="doc/img/phc_logo.png">
 
 The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions are made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time, vacation, maternity leave, etc. Specifically, the data product developed has four components - three predictive models and a dashboard.
 
@@ -39,7 +47,7 @@ If you are using Windows, please open any command prompt window and enter the fo
 sh setup.sh
 ```
 
-## How to use:
+## How to use
 
 ### Exception Count Prediction Tool:
 This tool allows you to train your data and predict the number of exceptions for a given timeframe. The predicted data will be outputted into a directory under `/data/predictions/`. The predicted file would be called `predictions.csv`. To use this tool, please enter the following into terminal or command prompt:
