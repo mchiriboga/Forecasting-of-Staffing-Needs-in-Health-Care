@@ -17,6 +17,8 @@ Forecasting of Staffing Needs
  | Proposal Report |[Proposal link](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/proposal.pdf)|
  |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation_slides.ipynb)|
  ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation.pdf)|
+ |Final Report|[.Rmd](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Report.Rmd)|
+ ||[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Report.pdf)|
 
 ## Setup
 To install all the necessary packages, please navigate to the root directory and install the necessary packages through the following codes:
