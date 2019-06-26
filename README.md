@@ -89,3 +89,19 @@ The dashboard was developed using Tableau, consolidating the three models.
 The dashboard .twb file can be found [here](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/src/phc_dashboard.twb) and uses as input the .csv outputs from the three models mentioned above, stored in [src/](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/tree/master/src).
 
 Tableau doesn’t support relative paths, meaning every data source connection in a .twb file points to an absolute path. So after cloning or forking the repo, the users will need to update the data source connections in their local machine when they first open the dashboard, ensuring the data source paths point to the correct files on their computer. For that, follow the instructions described [here](https://onlinehelp.tableau.com/current/pro/desktop/en-us/connect_basic_replace.htm).
+
+## Dependencies
+
+- Python (3.6.8) packages:
+  - PysimpleGUI (3.38.0)
+  - pandas (0.24.2)
+  - numpy (1.16.3)
+  - matplotlib (2.2.2)
+  - fbprophet (0.5)
+  - sklearn (0.20.2)
+  - stldecompose (0.0.5)
+  - argparse (1.1)
+- R (3.5.1) packages:
+  - tidyverse (1.2.1)
+  - qcc (2.7)
+- Tableau (2019.1.3)
