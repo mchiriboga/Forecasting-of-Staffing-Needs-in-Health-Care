@@ -12,13 +12,14 @@ Forecasting of Staffing Needs
 ### Milestones:
  |Deliverable|Link|
  |---|---|
- |Proposal Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.ipynb)|
- ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Proposal_Presentation.pdf)|
- | Proposal Report |[Proposal link](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/proposal.pdf)|
- |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation_slides.ipynb)|
- ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Presentation.pdf)|
- |Final Report|[.Rmd](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Report.Rmd)|
- ||[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/Final_Report.pdf)|
+ |Proposal Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/1.Proposal_Presentation.ipynb)|
+ ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/2.Proposal_Presentation.pdf)|
+ | Proposal Report |[.md](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/3.Proposal_Report.md))|
+ ||[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/4.Proposal_Report.pdf)|
+ |Final Presentation|[RISE presentation](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/5.Final_Presentation_slides.ipynb)|
+ ||[.pdf slides](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/6.Final_Presentation.pdf)|
+ |Final Report|[.Rmd](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/7.Final_Report.Rmd)|
+ ||[rendered .pdf](https://github.com/UBC-MDS/DSCI_591_capstone-Providence/blob/master/doc/8.Final_Report.pdf)|
 
 ## Setup
 To install all the necessary packages, please navigate to the root directory and install the necessary packages through the following codes:
