@@ -1,3 +1,5 @@
+<img align="right" width="200" src="doc/img/phc_logo.png">
+
 # Forecasting of Staffing Needs in Health Care
 
 ## Contributors:
@@ -17,8 +19,6 @@ Partner:
 
 
 ## Summary
-
-<img align="right" width="200" src="doc/img/phc_logo.png">
 
 The purpose of the project was to help the People Analytics and Innovation Team from Providence Health Care (PHC) to predict the short-term staff needs in order to prepare for unexpected potential costs and staff shortages. The predictions are made based on the historical records of scheduled exceptions, i.e. staff absences due to unexpected or previously arranged reasons such as sick time, vacation, maternity leave, etc. Specifically, the data product developed has four components - three predictive models and a dashboard.
 
